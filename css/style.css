@@ -1,0 +1,702 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+:root {
+    --green: #427e4e;
+    --dark: #1e1e1e;
+}
+
+*{
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    transition: .2s linear;
+}
+
+html {
+    font-size: 62.5%; /* 1rem = 10px */
+    scroll-behavior: smooth;
+}
+
+body{
+    background: #f5f5f5;
+    padding-top: 1rem; /* tijdelijk: minimaal zodat veranderingen duidelijk zichtbaar zijn */
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 6%;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: background .2s, padding .2s;
+}
+
+.header.scrolled{
+    background: rgba(255,255,255,0.95);
+    padding: .75rem 6%;
+}
+
+.header .logo{
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.header .logo i{
+    color: var(--green);
+    font-size: 2.4rem;
+}
+
+.header .navbar{
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+}
+
+.header .nav-link{
+    position: relative;
+    color: var(--dark);
+    font-size: 1.6rem;
+    padding: .25rem 0;
+}
+
+.header .nav-link::after{
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 2px;
+    width: 0;
+    background: var(--green);
+    transition: width .22s;
+    border-radius: 2px;
+}
+
+.header .nav-link:hover::after,
+.header .nav-link.active::after{
+    width: 100%;
+}
+
+.header .nav-link:hover{
+    color: var(--green);
+}
+
+.header .nav-cta{
+    padding: .55rem .9rem;
+    border-radius: 8px;
+    color: #fff;
+    background: var(--green);
+    box-shadow: 0 6px 18px rgba(66,126,78,0.15);
+}
+
+/* ================= MOBILE MENU ================= */
+
+#menu-btn{
+    font-size: 2.5rem;
+    color: white;
+    cursor: pointer;
+    display: none;
+}
+
+@media (max-width: 768px){
+
+    #menu-btn{
+        display: block;
+    }
+
+    .header .navbar{
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--green);
+        display: none;
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .header .navbar.active{
+        display: flex;
+    }
+
+    .header .navbar a{
+        margin: 1rem 0;
+        font-size: 2rem;
+    }
+}
+/* ================= FOOTER ================= */
+
+.footer{
+    background: var(--green-dark);
+    color: white;
+    margin-top: 5rem;
+}
+
+.sponsors{
+    padding: 4rem 9%;
+    text-align: center;
+}
+
+.sponsors h2{
+    font-size: 2.4rem;
+    margin-bottom: 3rem;
+    color: #000;
+}
+
+.sponsor-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 2rem;
+    align-items: center;
+}
+
+.sponsor{
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s ease;
+}
+
+.sponsor:hover{
+    transform: scale(1.05);
+}
+
+.sponsor img{
+    max-width: 100%;
+    max-height: 60px;
+    object-fit: contain;
+}
+.sponsors h2::after{
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: white;
+    margin: 1rem auto 0;
+}
+
+
+/* Footer bottom */
+
+.footer-bottom{
+    background: var(--green);
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 1.4rem;
+}
+
+
+.home-hero{
+    position: relative;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    /* de kleurverlopen worden in de slides zelf toegepast */
+    overflow: hidden;
+    background: linear-gradient(rgba(20,83,45,.85), rgba(20,83,45,.85)), url("../img/78.jpg") center/cover no-repeat;
+}
+
+/* slides achter de hero-content */
+.hero-slides{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.hero-slide{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.hero-slide.active{
+    opacity: 1;
+}
+
+/* overlay om het contrast te bewaren */
+.hero-slides::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(20,83,45,.85), rgba(20,83,45,.85));
+    z-index: 2;
+}
+
+/* hero-content moet boven de slides staan */
+.hero-content{
+    position: relative;
+    z-index: 3;
+}
+
+.hero-content h1{
+    font-size: 5rem;
+    color: white;
+    letter-spacing: .2rem;
+}
+
+.hero-content p{
+    font-size: 2rem;
+    color: #e5e5e5;
+    margin: 1.5rem 0 3rem;
+}
+
+.btn-primary{
+    padding: 1.2rem 3rem;
+    background: white;
+    color: var(--green-dark);
+    font-size: 1.6rem;
+    font-weight: 600;
+    border-radius: 30px;
+}
+.teams{
+    padding: 6rem 9%;
+    text-align: center;
+}
+
+.teams h2{
+    font-size: 3rem;
+    margin-bottom: 4rem;
+}
+
+.teams-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+}
+
+.team-card{
+    background: var(--green);
+    color: white;
+    padding: 4rem 2rem;
+    border-radius: 12px;
+    font-size: 2rem;
+    font-weight: 600;
+    transition: transform .2s, box-shadow .2s;
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.team-card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+.news{
+    background: #f5f5f5;
+    padding: 6rem 9%;
+}
+
+.news h2{
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 4rem;
+}
+
+.news-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2.5rem;
+}
+
+.news-card{
+    background: white;
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+}
+
+.news-card h3{
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.news-card p{
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.news-card a{
+    color: var(--green);
+    font-weight: 600;
+}
+
+/* ==== results/uitslagen page ==== */
+.results-hero{
+    min-height: 30vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(rgba(20,83,45,.85), rgba(20,83,45,.85)), url("../img/78.jpg") center/cover no-repeat;
+}
+
+.results-hero .hero-content h1{
+    font-size: 4rem;
+}
+
+.results-hero .hero-content p{
+    font-size: 1.8rem;
+}
+
+.uitslagen{
+    padding: 6rem 9%;
+    background: white;
+}
+
+.uitslagen-content{
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.intro-text{
+    font-size: 1.6rem;
+    color: #555;
+    margin-bottom: 4rem;
+    line-height: 1.8;
+    text-align: center;
+}
+
+.results-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.result-card{
+    background: #f9f9f9;
+    padding: 2.5rem;
+    border-radius: 12px;
+    border-left: 5px solid var(--green);
+    box-shadow: 0 .25rem .5rem rgba(0,0,0,.05);
+    transition: all .2s ease;
+}
+
+.result-card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.1);
+}
+
+.result-card .date{
+    font-size: 1.3rem;
+    color: var(--green);
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+}
+
+.result-card .title{
+    font-size: 1.7rem;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.result-card a{
+    display: inline-block;
+    color: white;
+    background: var(--green);
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.4rem;
+    transition: background .2s ease;
+}
+
+.result-card a:hover{
+    background: #35633e;
+}
+
+.results-cta{
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 3rem;
+    border-top: 1px solid #eee;
+}
+
+/* Style the PERKEZ CTA as a filled primary button to match site */
+.results-cta .btn-primary,
+.results-cta .btn-primary:visited{
+    background: var(--green);
+    color: #fff;
+    padding: 1.2rem 3rem;
+    border-radius: 30px;
+    display: inline-block;
+    font-weight: 700;
+    box-shadow: 0 .4rem .8rem rgba(0,0,0,.08);
+    text-decoration: none;
+}
+.results-cta .btn-primary:hover{
+    background: #35633e;
+    transform: translateY(-2px);
+}
+
+/* Loading spinner and error state for uitslagen */
+.results-loading{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 0;
+}
+
+.spinner{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: var(--green);
+    animation: spin 1s linear infinite;
+    background: transparent;
+}
+
+@keyframes spin{
+    to { transform: rotate(360deg); }
+}
+
+.results-loading .loading-text{
+    font-size: 1.6rem;
+    color: #444;
+}
+
+.results-error{
+    background: #fff3f3;
+    border: 1px solid #f1c2c2;
+    color: #8a1f1f;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.results-error p{
+    margin-bottom: 1rem;
+}
+
+.results-error .btn-primary{
+    background: var(--green);
+    color: white;
+}
+/* ===== KALENDER STYLING ===== */
+
+.calendar-tabs{
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn{
+    padding: 1rem 2rem;
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #444;
+    transition: all .2s ease;
+}
+
+.tab-btn:hover{
+    background: #e0e0e0;
+}
+
+.tab-btn.active{
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+}
+
+.calendar-team{
+    display: none;
+}
+
+.calendar-team.active{
+    display: block;
+}
+
+.calendar-team h3{
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.calendar-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.calendar-event{
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    border-left: 5px solid var(--green);
+    box-shadow: 0 .25rem .5rem rgba(0,0,0,.05);
+    transition: all .2s ease;
+}
+
+.calendar-event:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.1);
+}
+
+.cal-date{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    background: var(--green);
+    color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.cal-day{
+    font-size: 2rem;
+}
+
+.cal-month{
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    margin-top: .3rem;
+}
+
+.cal-info{
+    flex: 1;
+}
+
+.cal-teams{
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: .5rem;
+}
+
+.home-away{
+    display: inline-block;
+    background: #e8f5e9;
+    color: var(--green);
+    padding: .3rem .8rem;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-left: .5rem;
+}
+
+.home-away.away{
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.cal-opponent{
+    font-size: 1.5rem;
+    color: var(--green);
+    font-weight: 600;
+    margin-bottom: .5rem;
+}
+
+.cal-location{
+    font-size: 1.3rem;
+    color: #666;
+    margin-bottom: .3rem;
+}
+
+.cal-time{
+    font-size: 1.2rem;
+    color: #999;
+    font-weight: 500;
+}
+
+/* PDF Section */
+.calendar-pdf-section{
+    margin-top: 5rem;
+    padding-top: 3rem;
+    border-top: 2px solid #eee;
+}
+
+.calendar-pdf-section h3{
+    font-size: 2.2rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.calendar-pdf-section > p{
+    font-size: 1.5rem;
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+.calendar-pdf-viewer{
+    background: #f9f9f9;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px){
+    .calendar-tabs{
+        flex-direction: column;
+    }
+    
+    .tab-btn{
+        width: 100%;
+    }
+    
+    .calendar-event{
+        flex-direction: column;
+    }
+    
+    .cal-date{
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .calendar-grid{
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Hide PDF viewer on mobile */@media (max-width: 768px) { #pdf-viewer-desktop { display: none; } }

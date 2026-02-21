@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uitslagen - KVK Ettelgem</title>
+
+    <script src="https://kit.fontawesome.com/bd0d3608a5.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../img/favicon.png" type="image/png">
+</head>
+
+<body>
+
+<header class="header">
+    <a href="../index.html" class="logo">
+        <i class="fa fa-futbol-o"></i> KVK Ettelgem
+    </a>
+    
+    <nav class="navbar">
+        <a href="../index.html" class="nav-link" data-page="home">Home</a>
+        <a href="kalender.html" class="nav-link" data-page="kalender">Kalender</a>
+        <a href="uitslagen.html" class="nav-link" data-page="uitslagen">Uitslagen</a>
+        <a href="#" class="nav-link">Evenementen</a>
+    </nav>
+
+    <div class="icons">
+        <div id="menu-btn" class="fas fa-bars"></div>
+    </div>
+</header>
+
+<main>
+  <section class="hero results-hero">
+      <div class="hero-content">
+          <h1>Uitslagen &amp; Verbondsbladen</h1>
+          <p>Alle wedstrijdgegevens en uitslagen via de PERKEZ verbondsbladen</p>
+      </div>
+  </section>
+
+  <section class="uitslagen">
+    <div class="uitslagen-content">
+        <p class="intro-text">
+            Elke week publiceert de PERKEZ de officiële verbondsbladen met alle uitslagen, wedstrijdschema's en belangrijke informatie. 
+            Hieronder vind je de drie meest recente verbondsbladen. Voor het volledige archief, klik op de knop onderaan.
+        </p>
+
+        <div id="results-container" class="results-container" aria-live="polite">
+            <!-- Dynamisch ingeladen verbondsbladen -->
+        </div>
+
+        <div id="results-loading" class="results-loading" aria-hidden="true" style="display:none;">
+            <div class="spinner" aria-hidden="true"></div>
+            <div class="loading-text">Laden...</div>
+        </div>
+
+        <div id="results-error" class="results-error" style="display:none;">
+            <p id="results-error-text"></p>
+            <button id="results-retry" class="btn-primary">Opnieuw proberen</button>
+        </div>
+
+        <div class="calendar-pdf-section">
+            <h3>Bekijk de volledige verbondsbladen</h3>
+            <p>Download en bekijk de officiële PERKEZ verbondsbladen direct hier:</p>
+            
+            <div class="calendar-pdf-viewer" id="pdf-viewer-desktop">
+                <iframe 
+                    src="https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf#page=11" 
+                    title="PERKEZ Verbondsblad Nr. 1599"
+                    style="width:100%; height:600px; border:1px solid #ddd; border-radius:8px;">
+                </iframe>
+            </div>
+
+            <div class="results-cta">
+                <a href="https://www.perkez.be/verbondsbladen/" target="_blank" rel="noopener noreferrer" class="btn-primary">Naar alle verbondsbladen op PERKEZ</a>
+            </div>
+        </div>
+            
+  </section>
+
+</main>
+
+<script src="../js/script.js"></script>
+
+<footer class="footer">
+
+    <div class="sponsors">
+        <h2>Onze Sponsors</h2>
+
+        <div class="sponsor-grid">
+
+            <a href="#" class="sponsor">
+                <img src="../img/Sponser2.jpg" alt="Sponsor 1">
+            </a>
+
+            <a href="#" class="sponsor">
+                <img src="../img/Sponser4.png" alt="Sponsor 2">
+            </a>
+
+            <a href="#" class="sponsor">
+                <img src="../img/Sponser5.JPG" alt="Sponsor 3">
+            </a>
+
+            <a href="#" class="sponsor">
+                <img src="../img/Sponser6.jpg" alt="Sponsor 4">
+            </a>
+
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 KVK Ettelgem – Alle rechten voorbehouden</p>
+    </div>
+
+</footer>
+
+
+</body>
+</html>
