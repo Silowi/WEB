@@ -3,7 +3,28 @@ const navbar = document.querySelector(".navbar");
 
 menuBtn.onclick = () => {
     navbar.classList.toggle("active");
+    menuBtn.classList.toggle('fa-bars');
+    menuBtn.classList.toggle('fa-xmark');
+    menuBtn.classList.toggle('is-open');
 };
+
+document.querySelectorAll('.navbar .nav-link').forEach((link) => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            navbar.classList.remove('active');
+            menuBtn.classList.remove('fa-xmark', 'is-open');
+            menuBtn.classList.add('fa-bars');
+        }
+    });
+});
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        navbar.classList.remove('active');
+        menuBtn.classList.remove('fa-xmark', 'is-open');
+        menuBtn.classList.add('fa-bars');
+    }
+});
 
 function setActiveNavLink() {
     const navLinks = document.querySelectorAll('.header .nav-link[data-page]');
@@ -16,6 +37,8 @@ function setActiveNavLink() {
         currentPage = 'kalender';
     } else if (path.includes('/pages/uitslagen.html')) {
         currentPage = 'uitslagen';
+    } else if (path.includes('/pages/evenementen.html')) {
+        currentPage = 'evenementen';
     }
 
     navLinks.forEach((link) => {
