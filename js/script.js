@@ -49,7 +49,9 @@ function renderSharedFooter() {
             </div>
             <p>Locatie:<br>Vijfwegstraat 34-35<br>8460 Ettelgem (Oudenburg)</p>
             <a class="contact-mail" href="mailto:${email}">${email}</a>
-            <p class="footer-follow">Volg ons</p>
+        </div>
+        <div class="footer-socials-col">
+            <h3>Volg ons</h3>
             <div class="footer-socials" aria-label="Social media links">
                 <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                 <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
