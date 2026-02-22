@@ -3,14 +3,17 @@ import { addClickListener } from "./utils.js";
 const MOBILE_BREAKPOINT = 768;
 
 export function initMobileMenu() {
-    const menuBtn = document.querySelector("#menu-btn");
-    const navbar = document.querySelector(".navbar");
+    const menuBtn = document.querySelector(".header__menu-toggle");
+    const navbar = document.querySelector(".header__nav");
     if (!menuBtn || !navbar) return;
+
+    menuBtn.setAttribute("aria-expanded", "false");
 
     const closeMobileMenu = () => {
         navbar.classList.remove("active");
         menuBtn.classList.remove("fa-xmark", "is-open");
         menuBtn.classList.add("fa-bars");
+        menuBtn.setAttribute("aria-expanded", "false");
     };
 
     menuBtn.addEventListener("click", () => {
@@ -18,9 +21,10 @@ export function initMobileMenu() {
         menuBtn.classList.toggle("fa-bars");
         menuBtn.classList.toggle("fa-xmark");
         menuBtn.classList.toggle("is-open");
+        menuBtn.setAttribute("aria-expanded", String(navbar.classList.contains("active")));
     });
 
-    addClickListener(".navbar .nav-link", () => {
+    addClickListener(".header__nav .header__link", () => {
         if (window.innerWidth <= MOBILE_BREAKPOINT) closeMobileMenu();
     });
 
@@ -30,7 +34,7 @@ export function initMobileMenu() {
 }
 
 export function setActiveNavLink() {
-    const navLinks = document.querySelectorAll(".header .nav-link[data-page]");
+    const navLinks = document.querySelectorAll(".header .header__link[data-page]");
     if (!navLinks.length) return;
 
     const path = window.location.pathname.toLowerCase();
@@ -48,8 +52,8 @@ export function setActiveNavLink() {
 
     navLinks.forEach((link) => {
         const isActive = link.dataset.page === currentPage;
-        link.classList.toggle("active", isActive);
-        link.classList.toggle("nav-cta", isActive);
+        link.classList.toggle("header__link--active", isActive);
+        link.classList.toggle("header__link--cta", isActive);
         if (isActive) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
     });

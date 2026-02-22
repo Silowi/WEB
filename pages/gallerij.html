@@ -11,24 +11,7 @@
 </head>
 <body>
 
-<header class="header">
-    <a href="../index.html" class="logo">
-        <i class="fa fa-futbol-o"></i> KVK Ettelgem
-    </a>
-    
-    <nav class="navbar">
-        <a href="../index.html" class="nav-link" data-page="home">Home</a>
-        <a href="kalender.html" class="nav-link" data-page="kalender">Kalender</a>
-        <a href="uitslagen.html" class="nav-link" data-page="uitslagen">Rangschikking</a>
-        <a href="evenementen.html" class="nav-link" data-page="evenementen">Evenementen</a>
-        <a href="gallerij.html" class="nav-link" data-page="gallerij">Foto's</a>
-        <a href="contact.html" class="nav-link" data-page="contact">Contact</a>
-    </nav>
-
-    <div class="icons">
-        <div id="menu-btn" class="fas fa-bars"></div>
-    </div>
-</header>
+<header class="header"></header>
 
 <main>
   <section class="hero results-hero">
@@ -38,25 +21,19 @@
       </div>
   </section>
 
-  <section class="gallery-section">
+    <section class="gallery-section page-section">
     <div class="gallery-container">
-        
-        <!-- Filter Tabs -->
         <div class="gallery-filters">
             <button class="filter-btn active" data-filter="all">Alle foto's</button>
-            
             <button class="filter-btn" data-filter="evenementen">Evenementen</button>
         </div>
 
-        <!-- Gallery Grid -->
         <div class="gallery-grid">
-            
-            <!-- Wedstrijden -->
             <div class="gallery-item" data-category="wedstrijden">
-                <img src="../img/78.jpg" alt="Wedstrijd Ettelgem 78" loading="lazy">
+            <img src="../img/78.jpg" alt="Wedstrijd Ettelgem 78" loading="lazy">
                 <div class="gallery-overlay">
                     <i class="fas fa-search-plus"></i>
-                    <p>Ettelgem 78 </p>
+                    <p>Ettelgem 78</p>
                 </div>
             </div>
 
@@ -64,11 +41,10 @@
                 <img src="../img/82.jpg" alt="Wedstrijd Ettelgem 82" loading="lazy">
                 <div class="gallery-overlay">
                     <i class="fas fa-search-plus"></i>
-                    <p>Ettelgem 82 </p>
+                    <p>Ettelgem 82</p>
                 </div>
             </div>
 
-            <!-- Evenementen -->
             <div class="gallery-item" data-category="evenementen">
                 <img src="../img/bestuur etc.jpg" alt="Bestuur KVK Ettelgem" loading="lazy">
                 <div class="gallery-overlay">
@@ -76,18 +52,12 @@
                     <p>Bestuur & Vrijwilligers</p>
                 </div>
             </div>
-
-            <!-- Sponsors -->
-           
-            <!-- Voeg meer foto's toe door nieuwe .gallery-item divs te maken -->
-            
         </div>
 
-        <div class="gallery-empty" style="display: none;">
+        <div class="gallery-empty hidden">
             <i class="fas fa-images"></i>
             <p>Geen foto's gevonden in deze categorie</p>
         </div>
-
     </div>
   </section>
 

@@ -7,13 +7,6 @@
     background: linear-gradient(135deg, rgba(20,83,45,.9), rgba(66,126,78,.9)), url("../img/78.jpg") center/cover no-repeat;
 }
 
-.uitslagen{
-    padding: var(--spacing-large) 9%;
-    background: rgba(255,255,255,0.96);
-    border-radius: 28px;
-    box-shadow: 0 26px 52px rgba(0,0,0,0.08);
-}
-
 .uitslagen-content{
     max-width: 1000px;
     margin: 0 auto;
@@ -349,11 +342,6 @@
 }
 
 @media (max-width: 600px){
-    .uitslagen{
-        padding: 4rem 6%;
-        border-radius: 20px;
-    }
-
     .calendar-event{
         padding: 2rem;
     }

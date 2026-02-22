@@ -4,9 +4,11 @@ import { loadVerbondsbladen, initCalendarTabs } from "./calendar.js";
 import { loadKlassement } from "./klassement.js";
 import { initContactForm } from "./contact.js";
 import { initGallery } from "./gallery.js";
+import { renderSharedHeader } from "./header.js";
 import { renderSharedFooter } from "./footer.js";
 
 function initApp() {
+    renderSharedHeader();
     renderSharedFooter();
     initMobileMenu();
     setActiveNavLink();

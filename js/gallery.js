@@ -8,31 +8,33 @@ import { addClickListener } from "./utils.js";
 let currentImageIndex = 0;
 let visibleImages = [];
 
+function getVisibleGalleryItems() {
+    return Array.from(document.querySelectorAll(".gallery-item:not(.hidden)"));
+}
+
 /**
  * Filter galerij items op categorie
  */
 function filterGallery(category) {
     const items = document.querySelectorAll(".gallery-item");
     const emptyState = document.querySelector(".gallery-empty");
-    let visibleCount = 0;
+    let hasVisibleItems = false;
 
     items.forEach((item) => {
         const itemCategory = item.dataset.category;
         
         if (category === "all" || itemCategory === category) {
             item.classList.remove("hidden");
-            visibleCount++;
+            hasVisibleItems = true;
         } else {
             item.classList.add("hidden");
         }
     });
 
-    // Toon/verberg empty state
     if (emptyState) {
-        emptyState.style.display = visibleCount === 0 ? "block" : "none";
+        emptyState.classList.toggle("hidden", hasVisibleItems);
     }
 
-    // Update visibleImages array voor lightbox navigatie
     updateVisibleImages();
 }
 
@@ -40,12 +42,18 @@ function filterGallery(category) {
  * Update de lijst van zichtbare afbeeldingen
  */
 function updateVisibleImages() {
-    const items = document.querySelectorAll(".gallery-item:not(.hidden)");
-    visibleImages = Array.from(items).map((item) => ({
-        src: item.querySelector("img").src,
-        alt: item.querySelector("img").alt,
-        caption: item.querySelector(".gallery-overlay p")?.textContent || ""
-    }));
+    visibleImages = getVisibleGalleryItems()
+        .map((item) => {
+            const image = item.querySelector("img");
+            if (!image) return null;
+
+            return {
+                src: image.src,
+                alt: image.alt,
+                caption: item.querySelector(".gallery-overlay p")?.textContent ?? ""
+            };
+        })
+        .filter(Boolean);
 }
 
 /**
@@ -56,7 +64,7 @@ function openLightbox(index) {
     const lightboxImg = document.getElementById("lightbox-img");
     const lightboxCaption = document.getElementById("lightbox-caption");
 
-    if (!lightbox || !lightboxImg || !visibleImages.length) return;
+    if (!lightbox || !lightboxImg || !lightboxCaption || !visibleImages.length) return;
 
     currentImageIndex = index;
     const image = visibleImages[currentImageIndex];
@@ -105,34 +113,24 @@ export function initGallery() {
     const gallerySection = document.querySelector(".gallery-section");
     if (!gallerySection) return;
 
-    // Initialiseer visibleImages
     updateVisibleImages();
 
-    // Filter buttons
     const filterButtons = document.querySelectorAll(".filter-btn");
     filterButtons.forEach((button) => {
         button.addEventListener("click", () => {
-            // Update active state
             filterButtons.forEach((btn) => btn.classList.remove("active"));
             button.classList.add("active");
 
-            // Filter galerij
-            const category = button.dataset.filter;
-            filterGallery(category);
+            filterGallery(button.dataset.filter || "all");
         });
     });
 
-    // Gallery items - open lightbox bij klik
     addClickListener(".gallery-item", (event) => {
         const item = event.currentTarget;
-        const allVisibleItems = Array.from(
-            document.querySelectorAll(".gallery-item:not(.hidden)")
-        );
-        const index = allVisibleItems.indexOf(item);
+        const index = getVisibleGalleryItems().indexOf(item);
         if (index !== -1) openLightbox(index);
     });
 
-    // Lightbox controls
     const lightboxClose = document.querySelector(".lightbox-close");
     const lightboxPrev = document.querySelector(".lightbox-prev");
     const lightboxNext = document.querySelector(".lightbox-next");
@@ -156,7 +154,6 @@ export function initGallery() {
         });
     }
 
-    // Sluit lightbox bij klik op achtergrond
     if (lightbox) {
         lightbox.addEventListener("click", (event) => {
             if (event.target === lightbox) {
@@ -165,7 +162,6 @@ export function initGallery() {
         });
     }
 
-    // Keyboard navigatie
     document.addEventListener("keydown", (event) => {
         if (!lightbox || !lightbox.classList.contains("active")) return;
 

@@ -4,6 +4,13 @@ export function initHeroSlideshow() {
     const heroSlides = document.querySelectorAll(".hero-slide");
     if (!heroSlides.length) return;
 
+    heroSlides.forEach((slide) => {
+        const backgroundImage = slide.dataset.bg;
+        if (backgroundImage) {
+            slide.style.backgroundImage = `url('${backgroundImage}')`;
+        }
+    });
+
     let heroIndex = 0;
 
     const showHeroSlide = (index) =>

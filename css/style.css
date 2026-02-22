@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&family=Poppins:wght@300;400;600;700&display=swap');
 @import "./header.css";
 @import "./footer.css";
+@import "./pages.css";
 @import "./teams.css";
 @import "./news.css";
 @import "./calendar.css";
@@ -20,6 +21,25 @@
     --spacing-small: 1.4rem;
     --spacing-medium: 2.4rem;
     --spacing-large: 4rem;
+    --spacing-xl: 5.6rem;
+    --spacing-xxl: 7rem;
+    --radius-pill: 999px;
+    --radius-card: 18px;
+    --radius-button: 30px;
+    --shadow-soft: 0 6px 18px rgba(0,0,0,0.08);
+    --shadow-card: 0 12px 28px rgba(66,126,78,0.25);
+    --shadow-cta: 0 6px 20px rgba(66,126,78,0.2);
+    --white-translucent: rgba(255,255,255,0.55);
+    --white-opaque: rgba(255,255,255,0.95);
+    --white-soft: rgba(255,255,255,0.25);
+    --white-faint: rgba(255,255,255,0.15);
+    --menu-overlay: rgba(30,30,30,0.94);
+    --hero-overlay: rgba(20,83,45,0.85);
+    --border-muted: rgba(255,255,255,0.2);
+    --green-fade: rgba(66,126,78,0.08);
+    --green-highlight: rgba(66,126,78,0.12);
+    --danger: #c62828;
+    --success: #2e7d32;
 }
 
 *{
@@ -64,7 +84,7 @@ body h3{
     justify-content: center;
     text-align: center;
     overflow: hidden;
-    background: linear-gradient(rgba(20,83,45,.85), rgba(20,83,45,.85)), url("../img/78.jpg") center/cover no-repeat;
+    background: linear-gradient(var(--hero-overlay), var(--hero-overlay)), url("../img/78.jpg") center/cover no-repeat;
 }
 
 .hero-slides{
@@ -100,7 +120,7 @@ body h3{
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(rgba(20,83,45,.85), rgba(20,83,45,.85));
+    background: linear-gradient(var(--hero-overlay), var(--hero-overlay));
     z-index: 2;
 }
 
@@ -132,14 +152,16 @@ body h3{
 }
 
 .btn-primary{
-    padding: 1.2rem 3rem;
-    background: white;
+    padding: var(--spacing-small) var(--spacing-xl);
+    background: var(--surface);
     color: var(--green-dark);
     font-size: 1.6rem;
     font-weight: 700;
     letter-spacing: .02em;
-    border-radius: 24px;
+    border-radius: var(--radius-pill);
     font-family: 'Sora', 'Manrope', sans-serif;
+    border: none;
+    box-shadow: var(--shadow-cta);
 }
 
 @media (max-width: 600px){

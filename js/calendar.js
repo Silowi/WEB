@@ -38,7 +38,7 @@ const PERKEZ_URL = "https://www.perkez.be/verbondsbladen/";
  */
 function createResultCard(item) {
     const card = document.createElement("div");
-    card.className = "result-card";
+    card.className = "result-card card";
 
     const dateDiv = document.createElement("div");
     dateDiv.className = "date";
@@ -139,9 +139,9 @@ export async function loadVerbondsbladen() {
     const errorEl = document.querySelector(SELECTORS.error);
     const retryBtn = document.querySelector(SELECTORS.retry);
 
-    errorEl?.style.setProperty("display", "none");
+    errorEl?.classList.add("is-hidden");
     if (loadingEl) {
-        loadingEl.style.display = "flex";
+        loadingEl.classList.remove("is-hidden");
         loadingEl.setAttribute("aria-hidden", "false");
     }
 
@@ -158,11 +158,11 @@ export async function loadVerbondsbladen() {
         renderResultCards(container, verbondsbladen);
     } catch (error) {
         console.error("Verbondsbladen laden faalde, dummy-data getoond.", error);
-        if (errorEl) errorEl.style.display = "block";
+        if (errorEl) errorEl.classList.remove("is-hidden");
         renderResultCards(container, DUMMY_VERBONDSBLADEN);
     } finally {
         if (loadingEl) {
-            loadingEl.style.display = "none";
+            loadingEl.classList.add("is-hidden");
             loadingEl.setAttribute("aria-hidden", "true");
         }
     }

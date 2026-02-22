@@ -1,34 +1,34 @@
 /* ================= KLASSEMENT ================= */
 
 .klassement-section {
-    margin-top: 5rem;
-    padding-top: 4rem;
-    border-top: 2px solid rgba(0,0,0,0.08);
+    margin-top: var(--spacing-xxl);
+    padding-top: var(--spacing-large);
+    border-top: 2px solid var(--border);
 }
 
 .klassement-section h3 {
     font-size: 2.2rem;
     color: var(--dark);
-    margin-bottom: 1rem;
+    margin-bottom: var(--spacing-medium);
     font-weight: 600;
 }
 
 .klassement-last-updated {
     font-size: 1.3rem;
     color: var(--text-muted);
-    margin-bottom: 3rem;
+    margin-bottom: var(--spacing-large);
     font-style: italic;
 }
 
 .klassement-tabs {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 3rem;
+    gap: var(--spacing-small);
+    margin-bottom: var(--spacing-large);
     flex-wrap: wrap;
 }
 
 .klassement-tab-btn {
-    padding: 1rem 2rem;
+    padding: var(--spacing-small) var(--spacing-large);
     background: #f0f0f0;
     border: 2px solid #ddd;
     border-radius: 8px;
@@ -53,8 +53,8 @@
     display: none;
     overflow-x: auto;
     background: var(--surface);
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-soft);
 }
 
 .klassement-table-wrapper.active {
@@ -73,7 +73,7 @@
 }
 
 .klassement-table th {
-    padding: 1.4rem 1rem;
+    padding: var(--spacing-small) 1rem;
     text-align: left;
     font-weight: 600;
     font-size: 1.3rem;
@@ -86,7 +86,7 @@
 }
 
 .klassement-table tbody tr {
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid var(--border);
     transition: background .15s ease;
 }
 
@@ -95,16 +95,16 @@
 }
 
 .klassement-table tbody tr.highlight {
-    background: rgba(66,126,78,0.08);
+    background: var(--green-fade);
     font-weight: 600;
 }
 
 .klassement-table tbody tr.highlight:hover {
-    background: rgba(66,126,78,0.12);
+    background: var(--green-highlight);
 }
 
 .klassement-table td {
-    padding: 1.2rem 1rem;
+    padding: var(--spacing-small) 1rem;
     color: var(--dark);
 }
 

@@ -60,15 +60,15 @@ function showFormMessage(form, message, type) {
     if (!messageEl) return;
 
     messageEl.textContent = message;
-    messageEl.className = `form-message ${type}`;
-    messageEl.style.display = "block";
+    messageEl.classList.remove("success", "error", "is-hidden");
+    messageEl.classList.add(type);
 
     // Scroll naar bericht
     messageEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
     // Verberg na 8 seconden
     setTimeout(() => {
-        messageEl.style.display = "none";
+        messageEl.classList.add("is-hidden");
     }, 8000);
 }
 
@@ -80,12 +80,12 @@ function setSubmitLoading(button, isLoading) {
     const btnLoading = button.querySelector(".btn-loading");
 
     if (isLoading) {
-        btnText.style.display = "none";
-        btnLoading.style.display = "inline-block";
+        btnText.classList.add("is-hidden");
+        btnLoading.classList.remove("is-hidden");
         button.disabled = true;
     } else {
-        btnText.style.display = "inline-block";
-        btnLoading.style.display = "none";
+        btnText.classList.remove("is-hidden");
+        btnLoading.classList.add("is-hidden");
         button.disabled = false;
     }
 }
