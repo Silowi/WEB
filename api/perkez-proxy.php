@@ -17,6 +17,32 @@ $cacheFile = __DIR__ . '/perkez-cache.json';
 $cacheTtl = 600; // 10 minuten
 $maxSize = 1.5 * 1024 * 1024; // 1.5 MB
 $timeout = 8; // seconds
+$defaultPdfBase = 'https://www.perkez.be/website/wp-content/uploads';
+
+function normalizeUrl($href, $base = 'https://www.perkez.be') {
+    if (strpos($href, 'http') === 0) {
+        return $href;
+    }
+
+    return rtrim($base, '/') . '/' . ltrim($href, '/');
+}
+
+function extractDateForNumber($text, $num) {
+    $safeNum = preg_quote((string)$num, '/');
+    if (preg_match('/Verbondsblad\s*' . $safeNum . '.{0,220}?(\d{1,2}\s+\p{L}+\s+\d{4})/uis', $text, $m)) {
+        return trim($m[1]);
+    }
+
+    if (preg_match('/(\d{1,2}\s+\p{L}+\s+\d{4})/u', $text, $m)) {
+        return trim($m[1]);
+    }
+
+    if (preg_match('/(\d{1,2}\/\d{1,2}\/\d{4})/u', $text, $m)) {
+        return trim($m[1]);
+    }
+
+    return null;
+}
 
 // Only allow GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -82,60 +108,105 @@ if (strlen($content) > $maxSize) {
     exit;
 }
 
-// Parse HTML and extract PDF links matching Nr-XXXX.pdf
+// Parse HTML and extract latest verbondsblad
 libxml_use_internal_errors(true);
 $dom = new DOMDocument();
 $loaded = $dom->loadHTML($content);
 libxml_clear_errors();
 
 $xpath = new DOMXPath($dom);
-// Find all <a> with href containing Nr- and .pdf
-$nodes = $xpath->query('//a[contains(@href, "Nr-") and contains(@href, ".pdf")]');
 $found = [];
-foreach ($nodes as $node) {
-    $href = $node->getAttribute('href');
-    if (!preg_match('/Nr-(\d+)\.pdf/i', $href, $m)) continue;
+
+// Primary strategy: parse per verbondsblad heading and nearby date text
+$headingNodes = $xpath->query('//h3[contains(translate(normalize-space(.), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "verbondsblad")]');
+foreach ($headingNodes as $heading) {
+    $headingText = trim($heading->textContent);
+    if (!preg_match('/Verbondsblad\s*(\d+)/i', $headingText, $m)) {
+        continue;
+    }
+
     $num = $m[1];
-    // Avoid duplicates
-    if (isset($found[$num])) continue;
-    // Try to find a date near the node (ancestor text)
-    $date = 'Datum onbekend';
-    $ancestor = $node;
-    for ($i = 0; $i < 4 && $ancestor; $i++) {
-        $ancestor = $ancestor->parentNode;
-        if (!$ancestor) break;
-        $text = trim($ancestor->textContent);
-        if (preg_match('/(\d{1,2}\s+\w+\s+\d{4})/u', $text, $dm)) {
-            $date = $dm[1];
-            break;
+    if (isset($found[$num])) {
+        continue;
+    }
+
+    $parentText = $heading->parentNode ? trim($heading->parentNode->textContent) : $headingText;
+    $date = extractDateForNumber($parentText, $num);
+
+    if (!$date) {
+        $scanNode = $heading;
+        for ($i = 0; $i < 6 && $scanNode; $i++) {
+            $scanNode = $scanNode->nextSibling;
+            if (!$scanNode) {
+                break;
+            }
+
+            $candidate = trim($scanNode->textContent);
+            if ($candidate === '') {
+                continue;
+            }
+
+            $date = extractDateForNumber($candidate, $num);
+            if ($date) {
+                break;
+            }
         }
     }
-    // Normalize full URL if needed
-    $fullUrl = $href;
-    if (strpos($fullUrl, 'http') !== 0) {
-        // make absolute
-        $base = 'https://www.perkez.be';
-        $fullUrl = rtrim($base, '/') . '/' . ltrim($href, '/');
+
+    $pdfUrl = null;
+    $downloadLink = $xpath->query('.//a[contains(@href, ".pdf")]', $heading->parentNode)->item(0);
+    if ($downloadLink) {
+        $pdfUrl = normalizeUrl($downloadLink->getAttribute('href'));
     }
+
+    if (!$pdfUrl) {
+        $pdfUrl = rtrim($defaultPdfBase, '/') . '/Nr-' . $num . '.pdf';
+    }
+
     $found[$num] = [
         'title' => 'Verbondsblad ' . $num,
-        'date' => $date,
-        'url' => $fullUrl,
+        'date' => $date ?: 'Datum onbekend',
+        'url' => $pdfUrl,
     ];
 }
 
-// If none found via DOM, fallback to regex scanning of HTML (extract numbers)
+// Fallback: scan links for Nr-XXXX.pdf if heading strategy found nothing
 if (count($found) === 0) {
-    if (preg_match_all('/Nr-(\d+)\.pdf/i', $content, $matches)) {
-        $nums = array_unique($matches[1]);
-        rsort($nums, SORT_NUMERIC);
-        foreach ($nums as $num) {
-            if (count($found) >= 1) break;
-            $found[$num] = [
-                'title' => 'Verbondsblad ' . $num,
-                'date' => 'Datum onbekend',
-                'url' => 'https://www.perkez.be/website/wp-content/uploads/Nr-' . $num . '.pdf',
-            ];
+    $pdfNodes = $xpath->query('//a[contains(@href, "Nr-") and contains(@href, ".pdf")]');
+    foreach ($pdfNodes as $node) {
+        $href = $node->getAttribute('href');
+        if (!preg_match('/Nr-(\d+)\.pdf/i', $href, $m)) {
+            continue;
+        }
+
+        $num = $m[1];
+        if (isset($found[$num])) {
+            continue;
+        }
+
+        $date = 'Datum onbekend';
+        $ancestor = $node;
+        for ($i = 0; $i < 4 && $ancestor; $i++) {
+            $ancestor = $ancestor->parentNode;
+            if (!$ancestor) {
+                break;
+            }
+
+            $candidate = extractDateForNumber(trim($ancestor->textContent), $num);
+            if ($candidate) {
+                $date = $candidate;
+                break;
+            }
+        }
+
+        $found[$num] = [
+            'title' => 'Verbondsblad ' . $num,
+            'date' => $date,
+            'url' => normalizeUrl($href),
+        ];
+
+        if (count($found) >= 1) {
+            break;
         }
     }
 }
