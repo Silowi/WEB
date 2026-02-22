@@ -3,8 +3,7 @@
 // Veilig, beperkt proxy voor: https://www.perkez.be/verbondsbladen/
 // - Whitelist origins (pas aan naar je productie-domein)
 // - Cache resultaat 10 minuten
-// - Return JSON met maximaal 3 items: {title,date,url}
-// - Bewaart first-seen datum per PDF zodat nieuwe bestanden altijd een datum hebben
+// - Return JSON met exact 1 item: het meest recente verbondsblad {title,date,url}
 // - Timeouts, size limits, geen forwarding van cookies
 
 // Config - pas dit aan in productie
@@ -15,51 +14,9 @@ $allowedOrigins = [
 ];
 $targetUrl = 'https://www.perkez.be/verbondsbladen/';
 $cacheFile = __DIR__ . '/perkez-cache.json';
-$historyFile = __DIR__ . '/perkez-history.json';
 $cacheTtl = 600; // 10 minuten
 $maxSize = 1.5 * 1024 * 1024; // 1.5 MB
 $timeout = 8; // seconds
-
-function formatDutchDate($timestamp = null) {
-    if ($timestamp === null) {
-        $timestamp = time();
-    }
-
-    $months = [
-        1 => 'januari',
-        2 => 'februari',
-        3 => 'maart',
-        4 => 'april',
-        5 => 'mei',
-        6 => 'juni',
-        7 => 'juli',
-        8 => 'augustus',
-        9 => 'september',
-        10 => 'oktober',
-        11 => 'november',
-        12 => 'december',
-    ];
-
-    $day = (int)date('j', $timestamp);
-    $month = (int)date('n', $timestamp);
-    $year = date('Y', $timestamp);
-
-    return $day . ' ' . $months[$month] . ' ' . $year;
-}
-
-function loadJsonArray($filePath) {
-    if (!file_exists($filePath)) {
-        return [];
-    }
-
-    $raw = file_get_contents($filePath);
-    if ($raw === false || trim($raw) === '') {
-        return [];
-    }
-
-    $decoded = json_decode($raw, true);
-    return is_array($decoded) ? $decoded : [];
-}
 
 // Only allow GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -173,7 +130,7 @@ if (count($found) === 0) {
         $nums = array_unique($matches[1]);
         rsort($nums, SORT_NUMERIC);
         foreach ($nums as $num) {
-            if (count($found) >= 3) break;
+            if (count($found) >= 1) break;
             $found[$num] = [
                 'title' => 'Verbondsblad ' . $num,
                 'date' => 'Datum onbekend',
@@ -183,39 +140,10 @@ if (count($found) === 0) {
     }
 }
 
-// First-seen datum per PDF bijhouden (stabiel over requests)
-$history = loadJsonArray($historyFile);
-$today = formatDutchDate();
-foreach ($found as $num => $_item) {
-    if (!isset($history[$num]) || !is_string($history[$num]) || trim($history[$num]) === '') {
-        $history[$num] = $today;
-    }
-}
-
-// History compact houden: max 250 records, nieuwste nummers behouden
-if (count($history) > 250) {
-    $keys = array_keys($history);
-    usort($keys, function ($a, $b) {
-        return (int)$b <=> (int)$a;
-    });
-    $keys = array_slice($keys, 0, 250);
-    $trimmed = [];
-    foreach ($keys as $key) {
-        $trimmed[$key] = $history[$key];
-    }
-    $history = $trimmed;
-}
-
-@file_put_contents($historyFile, json_encode($history, JSON_UNESCAPED_UNICODE), LOCK_EX);
-
-// Prepare result: sort by number desc and take first 3
+// Prepare result: sort by number desc and take only the latest item
 if (count($found) > 0) {
     krsort($found, SORT_NUMERIC);
-    $result = array_slice($found, 0, 3, true);
-    foreach ($result as $num => &$item) {
-        $item['date'] = isset($history[$num]) ? $history[$num] : $today;
-    }
-    unset($item);
+    $result = array_slice($found, 0, 1, true);
 } else {
     $result = [];
 }

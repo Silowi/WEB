@@ -20,12 +20,10 @@ const LOAD_MORE_STEP = 3;
 const visibleMatchesPerTeam = new Map();
 
 const DUMMY_VERBONDSBLADEN = [
-    { title: "Verbondsblad Nr. 1599", date: "17 februari 2026", url: "https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf" },
-    { title: "Verbondsblad Nr. 1598", date: "10 februari 2026", url: "https://www.perkez.be/website/wp-content/uploads/Nr-1598.pdf" },
-    { title: "Verbondsblad Nr. 1597", date: "3 februari 2026", url: "https://www.perkez.be/website/wp-content/uploads/Nr-1597.pdf" }
+    { title: "Verbondsblad Nr. 1599", date: "17 februari 2026", url: "https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf" }
 ];
 
-const MAX_VERBONDSBLADEN = 3;
+const MAX_VERBONDSBLADEN = 1;
 
 const SELECTORS = {
     container: "#results-container",
