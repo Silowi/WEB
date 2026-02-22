@@ -40,7 +40,11 @@ export function setActiveNavLink() {
             ? "uitslagen"
             : path.includes("/pages/evenementen.html")
                 ? "evenementen"
-                : "home";
+                : path.includes("/pages/gallerij.html")
+                    ? "gallerij"
+                    : path.includes("/pages/contact.html")
+                        ? "contact"
+                        : "home";
 
     navLinks.forEach((link) => {
         const isActive = link.dataset.page === currentPage;

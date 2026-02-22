@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uitslagen - KVK Ettelgem</title>
+    <title>Klassement - KVK Ettelgem</title>
 
     <script src="https://kit.fontawesome.com/bd0d3608a5.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../css/style.css">
@@ -20,8 +20,10 @@
     <nav class="navbar">
         <a href="../index.html" class="nav-link" data-page="home">Home</a>
         <a href="kalender.html" class="nav-link" data-page="kalender">Kalender</a>
-        <a href="uitslagen.html" class="nav-link" data-page="uitslagen">Uitslagen</a>
+        <a href="uitslagen.html" class="nav-link" data-page="uitslagen">Rangschikking</a>
         <a href="evenementen.html" class="nav-link" data-page="evenementen">Evenementen</a>
+        <a href="gallerij.html" class="nav-link" data-page="gallerij">Foto's</a>
+        <a href="contact.html" class="nav-link" data-page="contact">Contact</a>
     </nav>
 
     <div class="icons">
@@ -32,8 +34,8 @@
 <main>
   <section class="hero results-hero">
       <div class="hero-content">
-          <h1>Uitslagen &amp; Verbondsbladen</h1>
-          <p>Alle wedstrijdgegevens en uitslagen via de PERKEZ verbondsbladen</p>
+          <h1>Klassement &amp; Verbondsbladen</h1>
+          <p>Bekijk de klassementen en wedstrijdgegevens via de PERKEZ verbondsbladen</p>
       </div>
   </section>
 
@@ -58,17 +60,67 @@
             <button id="results-retry" class="btn-primary">Opnieuw proberen</button>
         </div>
 
-        <div class="calendar-pdf-section">
-            <h3>Bekijk de volledige verbondsbladen</h3>
-            <p>Download en bekijk de officiële PERKEZ verbondsbladen direct hier:</p>
-            
-            <div class="calendar-pdf-viewer" id="pdf-viewer-desktop">
-                <iframe 
-                    src="https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf#page=11" 
-                    title="PERKEZ Verbondsblad Nr. 1599"
-                    class="pdf-embed">
-                </iframe>
+        <!-- Klassement Sectie -->
+        <div class="klassement-section">
+            <h3>Klassement</h3>
+            <p class="klassement-last-updated">Laatst bijgewerkt: --</p>
+
+            <!-- Reeks Tabs -->
+            <div class="klassement-tabs">
+                <button class="klassement-tab-btn active" data-reeks="1">Reeks 1 (Ettelgem 78 & 82)</button>
+                <button class="klassement-tab-btn" data-reeks="2">Reeks 2 (Ettelgem 68)</button>
             </div>
+
+            <!-- Klassement Reeks 1 (78 & 82) -->
+            <div id="klassement-reeks-1" class="klassement-table-wrapper active">
+                <table class="klassement-table">
+                    <thead>
+                        <tr>
+                            <th class="center">#</th>
+                            <th>Team</th>
+                            <th class="center">Ges</th>
+                            <th class="center hide-mobile">W</th>
+                            <th class="center hide-mobile">G</th>
+                            <th class="center hide-mobile">V</th>
+                            <th class="center hide-mobile">DV</th>
+                            <th class="center hide-mobile">DT</th>
+                            <th class="center">+/-</th>
+                            <th class="center">Ptn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamisch ingeladen via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Klassement Reeks 2 (68) -->
+            <div id="klassement-reeks-2" class="klassement-table-wrapper">
+                <table class="klassement-table">
+                    <thead>
+                        <tr>
+                            <th class="center">#</th>
+                            <th>Team</th>
+                            <th class="center">Ges</th>
+                            <th class="center hide-mobile">W</th>
+                            <th class="center hide-mobile">G</th>
+                            <th class="center hide-mobile">V</th>
+                            <th class="center hide-mobile">DV</th>
+                            <th class="center hide-mobile">DT</th>
+                            <th class="center">+/-</th>
+                            <th class="center">Ptn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamisch ingeladen via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="calendar-pdf-section">
+            <h3>Volledige verbondsbladen</h3>
+            <p>Bekijk de officiële PERKEZ verbondsbladen met alle uitslagen en wedstrijdinfo:</p>
 
             <div class="results-cta">
                 <a href="https://www.perkez.be/verbondsbladen/" target="_blank" rel="noopener noreferrer" class="btn-primary">Naar alle verbondsbladen op PERKEZ</a>

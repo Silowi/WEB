@@ -1,0 +1,203 @@
+/* ================= KLASSEMENT ================= */
+
+.klassement-section {
+    margin-top: 5rem;
+    padding-top: 4rem;
+    border-top: 2px solid rgba(0,0,0,0.08);
+}
+
+.klassement-section h3 {
+    font-size: 2.2rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.klassement-last-updated {
+    font-size: 1.3rem;
+    color: var(--text-muted);
+    margin-bottom: 3rem;
+    font-style: italic;
+}
+
+.klassement-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.klassement-tab-btn {
+    padding: 1rem 2rem;
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #444;
+    transition: all .2s ease;
+}
+
+.klassement-tab-btn:hover {
+    background: #e0e0e0;
+}
+
+.klassement-tab-btn.active {
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+}
+
+.klassement-table-wrapper {
+    display: none;
+    overflow-x: auto;
+    background: var(--surface);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.klassement-table-wrapper.active {
+    display: block;
+}
+
+.klassement-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.4rem;
+}
+
+.klassement-table thead {
+    background: var(--green);
+    color: white;
+}
+
+.klassement-table th {
+    padding: 1.4rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.klassement-table th.center {
+    text-align: center;
+}
+
+.klassement-table tbody tr {
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    transition: background .15s ease;
+}
+
+.klassement-table tbody tr:hover {
+    background: rgba(66,126,78,0.04);
+}
+
+.klassement-table tbody tr.highlight {
+    background: rgba(66,126,78,0.08);
+    font-weight: 600;
+}
+
+.klassement-table tbody tr.highlight:hover {
+    background: rgba(66,126,78,0.12);
+}
+
+.klassement-table td {
+    padding: 1.2rem 1rem;
+    color: var(--dark);
+}
+
+.klassement-table td.center {
+    text-align: center;
+}
+
+.klassement-table td.position {
+    font-weight: 700;
+    color: var(--green);
+    font-size: 1.5rem;
+    width: 50px;
+}
+
+.klassement-table td.team {
+    font-weight: 600;
+    min-width: 180px;
+}
+
+.klassement-table td.points {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--green-dark);
+}
+
+/* Positie badges */
+.klassement-table tbody tr:nth-child(1) td.position {
+    color: #FFD700;
+}
+
+.klassement-table tbody tr:nth-child(2) td.position {
+    color: #C0C0C0;
+}
+
+.klassement-table tbody tr:nth-child(3) td.position {
+    color: #CD7F32;
+}
+
+/* Doelsaldo kolom */
+.klassement-table td.goal-diff {
+    font-weight: 600;
+}
+
+.klassement-table td.goal-diff.positive {
+    color: #2e7d32;
+}
+
+.klassement-table td.goal-diff.negative {
+    color: #c62828;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .klassement-tabs {
+        flex-direction: column;
+    }
+
+    .klassement-tab-btn {
+        width: 100%;
+    }
+
+    .klassement-table {
+        font-size: 1.2rem;
+    }
+
+    .klassement-table th,
+    .klassement-table td {
+        padding: 1rem 0.6rem;
+    }
+
+    .klassement-table th {
+        font-size: 1.1rem;
+    }
+
+    .klassement-table td.team {
+        min-width: 120px;
+        font-size: 1.3rem;
+    }
+
+    /* Verberg minder belangrijke kolommen op mobiel */
+    .klassement-table th.hide-mobile,
+    .klassement-table td.hide-mobile {
+        display: none;
+    }
+}
+
+@media (max-width: 500px) {
+    .klassement-table td.position {
+        font-size: 1.3rem;
+        width: 40px;
+    }
+
+    .klassement-table td.points {
+        font-size: 1.4rem;
+    }
+}

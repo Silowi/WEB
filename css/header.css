@@ -37,7 +37,7 @@
 
 .header .navbar{
     display: flex;
-    gap: 1.25rem;
+    gap: 3rem;
     align-items: center;
 }
 

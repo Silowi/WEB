@@ -4,6 +4,9 @@
 @import "./teams.css";
 @import "./news.css";
 @import "./calendar.css";
+@import "./klassement.css";
+@import "./contact.css";
+@import "./gallery.css";
 
 :root {
     --green: #427e4e;

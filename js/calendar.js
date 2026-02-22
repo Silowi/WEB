@@ -32,14 +32,32 @@ const SELECTORS = {
 
 const PERKEZ_URL = "https://www.perkez.be/verbondsbladen/";
 
+/**
+ * Maakt een result card element veilig aan (XSS-beschermd)
+ * Gebruikt textContent i.p.v. innerHTML om script injectie te voorkomen
+ */
 function createResultCard(item) {
     const card = document.createElement("div");
     card.className = "result-card";
-    card.innerHTML = `
-        <div class="date">${item.date}</div>
-        <div class="title">${item.title}</div>
-        <a href="${item.url}" target="_blank" rel="noreferrer">PDF Downloaden</a>
-    `;
+
+    const dateDiv = document.createElement("div");
+    dateDiv.className = "date";
+    dateDiv.textContent = item.date;
+
+    const titleDiv = document.createElement("div");
+    titleDiv.className = "title";
+    titleDiv.textContent = item.title;
+
+    const link = document.createElement("a");
+    link.href = item.url; // Browsers saneren href automatisch
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = "PDF Downloaden";
+
+    card.appendChild(dateDiv);
+    card.appendChild(titleDiv);
+    card.appendChild(link);
+
     return card;
 }
 
@@ -150,6 +168,10 @@ export async function loadVerbondsbladen() {
     }
 }
 
+/**
+ * Parse evenement datum uit DOM elementen en bereken correct jaar
+ * Handelt jaaroverschrijding af (Aug-Dec = huidig jaar, Jan-Jul = volgend jaar)
+ */
 function getEventDate(event, referenceDate) {
     const dayEl = event.querySelector(".cal-day");
     const monthEl = event.querySelector(".cal-month");
@@ -159,12 +181,17 @@ function getEventDate(event, referenceDate) {
     const month = MONTH_MAP[monthEl.textContent.trim()];
     if (Number.isNaN(day) || month === undefined) return null;
 
+    // Als de maand van het evenement vroeger is dan de huidige maand, neem volgend jaar aan
     const year = month < referenceDate.getMonth() ? referenceDate.getFullYear() + 1 : referenceDate.getFullYear();
     const eventDate = new Date(year, month, day);
     eventDate.setHours(0, 0, 0, 0);
     return eventDate;
 }
 
+/*
+ * Filtert en toont enkel komende wedstrijden (max 3 per team)
+ * Verbergt voorbije wedstrijden en ongeldige datums
+ */
 function filterUpcomingMatches() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -175,10 +202,12 @@ function filterUpcomingMatches() {
             date: getEventDate(event, today)
         }));
 
+        // Verbergt evenementen met ongeldige datums
         events.forEach(({ element, date }) => {
             element.style.display = date ? "" : "none";
         });
 
+        // Sorteert komende evenementen op datum en behoud enkel eerste 3
         const upcoming = events
             .filter(({ date }) => date && date >= today)
             .sort((a, b) => a.date - b.date);
@@ -212,10 +241,15 @@ export function initCalendarTabs() {
         switchTeam(button.dataset.team, tabButtons, calendarTeams);
     });
 
+    // Verwerk ?team=XX URL parameter (met validatie)
     const teamParam = new URLSearchParams(window.location.search).get("team");
     if (teamParam) {
-        const targetButton = Array.from(tabButtons).find((button) => button.dataset.team === teamParam);
-        if (targetButton) targetButton.click();
+        // Sta enkel geldige team ID's toe die bestaan in de DOM 
+        const validTeams = Array.from(tabButtons).map(btn => btn.dataset.team);
+        if (validTeams.includes(teamParam)) {
+            const targetButton = Array.from(tabButtons).find((button) => button.dataset.team === teamParam);
+            if (targetButton) targetButton.click();
+        }
     }
 
     filterUpcomingMatches();
