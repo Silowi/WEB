@@ -32,9 +32,7 @@ const SELECTORS = {
     retry: "#results-retry"
 };
 const PROXY_ENDPOINTS = [
-    "/.netlify/functions/perkez-proxy",
-    "/api/perkez-proxy.php",
-    "../api/perkez-proxy.php"
+    "/.netlify/functions/perkez-proxy"
 ];
 
 const PERKEZ_URL = "https://www.perkez.be/verbondsbladen/";

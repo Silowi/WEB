@@ -104,31 +104,28 @@ async function submitContactForm(form) {
     setSubmitLoading(submitButton, true);
 
     try {
-        const response = await fetch(form.action, {
+        const response = await fetch(form.action || "/", {
             method: "POST",
-            body: formData
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams(formData).toString()
         });
 
-        const result = await response.json();
-
-        if (result.success) {
-            showFormMessage(
-                form,
-                "Bedankt! Je bericht is succesvol verzonden. We nemen zo snel mogelijk contact op.",
-                "success"
-            );
-            form.reset();
-            // Verwijder alle error classes
-            form.querySelectorAll(".form-group").forEach((group) => {
-                group.classList.remove("error");
-            });
-        } else {
-            showFormMessage(
-                form,
-                result.message || "Er is iets misgegaan. Probeer het later opnieuw of mail ons direct.",
-                "error"
-            );
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
+
+        showFormMessage(
+            form,
+            "Bedankt! Je bericht is succesvol verzonden. We nemen zo snel mogelijk contact op.",
+            "success"
+        );
+        form.reset();
+        // Verwijder alle error classes
+        form.querySelectorAll(".form-group").forEach((group) => {
+            group.classList.remove("error");
+        });
     } catch (error) {
         console.error("Formulier verzending fout:", error);
         showFormMessage(

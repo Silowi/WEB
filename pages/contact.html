@@ -66,7 +66,19 @@
             <h2>Stuur ons een bericht</h2>
             <p class="form-intro">Heb je een vraag of opmerking? Vul het formulier in en we nemen zo snel mogelijk contact met je op.</p>
 
-            <form id="contact-form" class="contact-form" method="POST" action="../api/contact-handler.php">
+            <form
+                id="contact-form"
+                class="contact-form"
+                name="contact"
+                method="POST"
+                action="/"
+                data-netlify="true"
+                netlify-honeypot="bot-field"
+            >
+                <input type="hidden" name="form-name" value="contact">
+                <p class="is-hidden">
+                    <label>Niet invullen: <input name="bot-field"></label>
+                </p>
                 
                 <div class="form-group">
                     <label for="name">Naam *</label>
