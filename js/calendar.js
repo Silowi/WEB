@@ -193,8 +193,12 @@ function getEventDate(event, referenceDate) {
  * Verbergt voorbije wedstrijden en ongeldige datums
  */
 function filterUpcomingMatches() {
-    const today = new Date();
+    const now = new Date();
+    const today = new Date(now);
     today.setHours(0, 0, 0, 0);
+    const noonToday = new Date(today);
+    noonToday.setHours(12, 0, 0, 0);
+    const isAfterNoon = now >= noonToday;
 
     document.querySelectorAll(".calendar-team").forEach((team) => {
         const events = Array.from(team.querySelectorAll(".calendar-event")).map((event) => ({
@@ -209,9 +213,17 @@ function filterUpcomingMatches() {
 
         // Sorteert komende evenementen op datum en behoud enkel eerste 3
         const upcoming = events
-            .filter(({ date }) => date && date >= today)
+            .filter(({ date }) => {
+                if (!date) return false;
+                if (date > today) return true;
+                return date.getTime() === today.getTime() && !isAfterNoon;
+            })
             .sort((a, b) => a.date - b.date);
-        const past = events.filter(({ date }) => date && date < today);
+        const past = events.filter(({ date }) => {
+            if (!date) return false;
+            if (date < today) return true;
+            return date.getTime() === today.getTime() && isAfterNoon;
+        });
 
         upcoming.forEach(({ element }, index) => {
             element.style.display = index < 3 ? "" : "none";
