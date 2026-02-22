@@ -80,6 +80,12 @@ function switchKlassementTab(reeksId, tabButtons, tableWrappers) {
     });
 }
 
+function mapTeamToReeks(teamId) {
+    if (teamId === "68") return "2";
+    if (teamId === "78" || teamId === "82") return "1";
+    return null;
+}
+
 /**
  * Update de "laatst bijgewerkt" datum
  */
@@ -137,8 +143,12 @@ export async function loadKlassement() {
 
         const initialActiveButton = Array.from(tabButtons).find((button) => button.classList.contains("active"))
             || tabButtons[0];
-        if (initialActiveButton) {
-            switchKlassementTab(initialActiveButton.dataset.reeks, tabButtons, tableWrappers);
+        const teamParam = new URLSearchParams(window.location.search).get("team");
+        const reeksFromTeam = mapTeamToReeks(teamParam);
+        const initialReeks = reeksFromTeam || initialActiveButton?.dataset.reeks;
+
+        if (initialReeks) {
+            switchKlassementTab(initialReeks, tabButtons, tableWrappers);
         }
 
     } catch (error) {

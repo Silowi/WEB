@@ -15,6 +15,10 @@ const MONTH_MAP = {
     Dec: 11
 };
 
+const INITIAL_VISIBLE_MATCHES = 3;
+const LOAD_MORE_STEP = 3;
+const visibleMatchesPerTeam = new Map();
+
 const DUMMY_VERBONDSBLADEN = [
     { title: "Verbondsblad Nr. 1599", date: "17 februari 2026", url: "https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf" },
     { title: "Verbondsblad Nr. 1598", date: "10 februari 2026", url: "https://www.perkez.be/website/wp-content/uploads/Nr-1598.pdf" },
@@ -172,6 +176,22 @@ export async function loadVerbondsbladen() {
  * Parse evenement datum uit DOM elementen en bereken correct jaar
  * Handelt jaaroverschrijding af (Aug-Dec = huidig jaar, Jan-Jul = volgend jaar)
  */
+function getSeasonBounds(referenceDate) {
+    const currentYear = referenceDate.getFullYear();
+    const currentMonth = referenceDate.getMonth();
+
+    const seasonStartYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+    const seasonEndYear = seasonStartYear + 1;
+    const seasonEndDate = new Date(seasonEndYear, 6, 31);
+    seasonEndDate.setHours(23, 59, 59, 999);
+
+    return {
+        seasonStartYear,
+        seasonEndYear,
+        seasonEndDate
+    };
+}
+
 function getEventDate(event, referenceDate) {
     const dayEl = event.querySelector(".cal-day");
     const monthEl = event.querySelector(".cal-month");
@@ -181,18 +201,47 @@ function getEventDate(event, referenceDate) {
     const month = MONTH_MAP[monthEl.textContent.trim()];
     if (Number.isNaN(day) || month === undefined) return null;
 
-    // Als de maand van het evenement vroeger is dan de huidige maand, neem volgend jaar aan
-    const year = month < referenceDate.getMonth() ? referenceDate.getFullYear() + 1 : referenceDate.getFullYear();
+    const { seasonStartYear, seasonEndYear } = getSeasonBounds(referenceDate);
+    const year = month >= 7 ? seasonStartYear : seasonEndYear;
+
     const eventDate = new Date(year, month, day);
     eventDate.setHours(0, 0, 0, 0);
     return eventDate;
 }
 
-/*
- * Filtert en toont enkel komende wedstrijden (max 3 per team)
- * Verbergt voorbije wedstrijden en ongeldige datums
- */
-function filterUpcomingMatches() {
+function getUpcomingEventsForTeam(teamElement, today, isAfterNoon) {
+    const { seasonEndDate } = getSeasonBounds(today);
+
+    const events = Array.from(teamElement.querySelectorAll(".calendar-event")).map((event) => ({
+        element: event,
+        date: getEventDate(event, today)
+    }));
+
+    const upcoming = events
+        .filter(({ date }) => {
+            if (!date) return false;
+            if (today > seasonEndDate) return false;
+            if (date > seasonEndDate) return false;
+            if (date > today) return true;
+            return date.getTime() === today.getTime() && !isAfterNoon;
+        })
+        .sort((a, b) => a.date - b.date);
+
+    return { events, upcoming };
+}
+
+function getTeamIdFromElement(teamElement) {
+    return teamElement.id.replace("calendar-", "");
+}
+
+function getActiveTeamElement(calendarTeams) {
+    return Array.from(calendarTeams).find((team) => team.classList.contains("active")) || null;
+}
+
+function updateLoadMoreButtonState(activeTeamElement) {
+    const loadMoreButton = document.querySelector("#calendar-load-more");
+    if (!loadMoreButton || !activeTeamElement) return;
+
     const now = new Date();
     const today = new Date(now);
     today.setHours(0, 0, 0, 0);
@@ -200,25 +249,34 @@ function filterUpcomingMatches() {
     noonToday.setHours(12, 0, 0, 0);
     const isAfterNoon = now >= noonToday;
 
-    document.querySelectorAll(".calendar-team").forEach((team) => {
-        const events = Array.from(team.querySelectorAll(".calendar-event")).map((event) => ({
-            element: event,
-            date: getEventDate(event, today)
-        }));
+    const activeTeamId = getTeamIdFromElement(activeTeamElement);
+    const visibleCount = visibleMatchesPerTeam.get(activeTeamId) || INITIAL_VISIBLE_MATCHES;
+    const { upcoming } = getUpcomingEventsForTeam(activeTeamElement, today, isAfterNoon);
 
-        // Verbergt evenementen met ongeldige datums
+    loadMoreButton.hidden = visibleCount >= upcoming.length;
+}
+
+/*
+ * Filtert en toont enkel komende wedstrijden (max 3 per team)
+ * Verbergt voorbije wedstrijden en ongeldige datums
+ */
+function filterUpcomingMatches(calendarTeams) {
+    const now = new Date();
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    const noonToday = new Date(today);
+    noonToday.setHours(12, 0, 0, 0);
+    const isAfterNoon = now >= noonToday;
+
+    calendarTeams.forEach((team) => {
+        const { events, upcoming } = getUpcomingEventsForTeam(team, today, isAfterNoon);
+        const teamId = getTeamIdFromElement(team);
+        const visibleCount = visibleMatchesPerTeam.get(teamId) || INITIAL_VISIBLE_MATCHES;
+
         events.forEach(({ element, date }) => {
             element.style.display = date ? "" : "none";
         });
 
-        // Sorteert komende evenementen op datum en behoud enkel eerste 3
-        const upcoming = events
-            .filter(({ date }) => {
-                if (!date) return false;
-                if (date > today) return true;
-                return date.getTime() === today.getTime() && !isAfterNoon;
-            })
-            .sort((a, b) => a.date - b.date);
         const past = events.filter(({ date }) => {
             if (!date) return false;
             if (date < today) return true;
@@ -226,12 +284,14 @@ function filterUpcomingMatches() {
         });
 
         upcoming.forEach(({ element }, index) => {
-            element.style.display = index < 3 ? "" : "none";
+            element.style.display = index < visibleCount ? "" : "none";
         });
         past.forEach(({ element }) => {
             element.style.display = "none";
         });
     });
+
+    updateLoadMoreButtonState(getActiveTeamElement(calendarTeams));
 }
 
 function switchTeam(teamId, tabButtons, calendarTeams) {
@@ -241,16 +301,44 @@ function switchTeam(teamId, tabButtons, calendarTeams) {
     });
 }
 
+function updateRankingLink(teamId) {
+    const rankingLink = document.querySelector("#calendar-ranking-link");
+    if (!rankingLink) return;
+    rankingLink.href = `./uitslagen.html?team=${encodeURIComponent(teamId)}#klassement`;
+}
+
 export function initCalendarTabs() {
     const tabButtons = document.querySelectorAll(".tab-btn");
     const calendarTeams = document.querySelectorAll(".calendar-team");
     if (!tabButtons.length || !calendarTeams.length) return;
+
+    calendarTeams.forEach((team) => {
+        visibleMatchesPerTeam.set(getTeamIdFromElement(team), INITIAL_VISIBLE_MATCHES);
+    });
 
     addClickListener(".tab-btn", (event) => {
         event.preventDefault();
         const button = event.currentTarget;
         if (!button) return;
         switchTeam(button.dataset.team, tabButtons, calendarTeams);
+        updateRankingLink(button.dataset.team);
+        filterUpcomingMatches(calendarTeams);
+    });
+
+    addClickListener("#calendar-load-more", () => {
+        try {
+            const activeTeam = getActiveTeamElement(calendarTeams);
+            if (!activeTeam) return;
+
+            const activeTeamId = getTeamIdFromElement(activeTeam);
+            const currentVisible = visibleMatchesPerTeam.get(activeTeamId) || INITIAL_VISIBLE_MATCHES;
+            visibleMatchesPerTeam.set(activeTeamId, currentVisible + LOAD_MORE_STEP);
+            filterUpcomingMatches(calendarTeams);
+        } catch (error) {
+            console.error("Fout bij laden van extra wedstrijden:", error);
+            const loadMoreButton = document.querySelector("#calendar-load-more");
+            if (loadMoreButton) loadMoreButton.hidden = true;
+        }
     });
 
     // Verwerk ?team=XX URL parameter (met validatie)
@@ -264,5 +352,10 @@ export function initCalendarTabs() {
         }
     }
 
-    filterUpcomingMatches();
+    const activeButton = Array.from(tabButtons).find((button) => button.classList.contains("active")) || tabButtons[0];
+    if (activeButton) {
+        updateRankingLink(activeButton.dataset.team);
+    }
+
+    filterUpcomingMatches(calendarTeams);
 }

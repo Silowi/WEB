@@ -96,6 +96,29 @@
     transform: translateY(-2px);
 }
 
+.calendar-action-cta{
+    margin-top: 0;
+    margin-bottom: 2.5rem;
+    padding-top: 0;
+    border-top: 0;
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.calendar-action-cta .btn-secondary-action,
+.calendar-action-cta .btn-secondary-action:visited{
+    background: transparent;
+    color: var(--green);
+    border: 2px solid var(--green);
+}
+
+.calendar-action-cta .btn-secondary-action:hover{
+    background: var(--green-fade);
+    color: var(--green-dark);
+}
+
 .results-loading{
     display: flex;
     align-items: center;
@@ -145,6 +168,16 @@
 @media (max-width: 768px){
     .calendar-tabs{
         flex-direction: column;
+    }
+
+    .calendar-action-cta{
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .calendar-action-cta .btn-primary,
+    .calendar-action-cta .btn-secondary-action{
+        width: 100%;
     }
 
     .tab-btn{
