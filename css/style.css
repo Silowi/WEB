@@ -302,10 +302,32 @@ body h3{
         transform: none;
     }
 
+    .home-hero-mobile .hero-content{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 0.6rem;
+    }
+
+    .home-hero-mobile .hero-header-meta{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        flex-basis: auto;
+    }
+
+    .home-hero-mobile .hero-content h1,
+    .home-hero-mobile .hero-content > p,
+    .home-hero-mobile .hero-actions{
+        flex-basis: 100%;
+    }
+
     .hero-actions .btn-primary,
     .hero-actions .btn-hero-alt{
         width: 100%;
         text-align: center;
+        flex-basis: 100%;
     }
 
     .hero-content h1,
@@ -320,7 +342,18 @@ body h3{
     }
 
     .hero-meta{
+        display: flex;
         gap: 1.2rem;
+        margin: 0;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .hero-eyebrow{
+        display: inline-flex;
+        align-items: center;
+        margin: 0;
+        padding: 0.5rem 1.2rem;
     }
 }
 
