@@ -85,6 +85,14 @@
     box-shadow: var(--shadow-cta);
 }
 
+.header__link.header__link--active.header__link--cta{
+    color: #fff;
+}
+
+.header__link.header__link--active.header__link--cta::after{
+    background: #fff;
+}
+
 .header__menu-toggle{
     width: 4.2rem;
     height: 4.2rem;

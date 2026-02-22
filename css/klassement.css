@@ -57,6 +57,10 @@
     box-shadow: var(--shadow-soft);
 }
 
+.klassement-table-wrapper[hidden] {
+    display: none !important;
+}
+
 .klassement-table-wrapper.active {
     display: block;
 }
@@ -99,6 +103,12 @@
     font-weight: 600;
 }
 
+.klassement-table tbody tr.highlight td.team,
+.klassement-table tbody tr.highlight td.points,
+.klassement-table tbody tr.highlight td.position {
+    color: var(--green-dark);
+}
+
 .klassement-table tbody tr.highlight:hover {
     background: var(--green-highlight);
 }
@@ -117,6 +127,26 @@
     color: var(--green);
     font-size: 1.5rem;
     width: 50px;
+}
+
+.klassement-table td.position .position-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.klassement-table td.position .position-change {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.klassement-table td.position .position-change.up {
+    color: var(--success);
+}
+
+.klassement-table td.position .position-change.down {
+    color: var(--danger);
 }
 
 .klassement-table td.team {

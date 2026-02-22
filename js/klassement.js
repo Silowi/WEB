@@ -7,6 +7,11 @@ import { addClickListener } from "./utils.js";
 
 const KLASSEMENT_DATA_PATH = "../data/klassement.json";
 
+function getPositionChange(teamData) {
+    if (typeof teamData.previousPosition !== "number") return 0;
+    return teamData.previousPosition - teamData.position;
+}
+
 /**
  * Maak een tabel rij voor één team aan
  */
@@ -16,9 +21,15 @@ function createTableRow(teamData, isOwnTeam = false) {
 
     const goalDiff = teamData.goalsFor - teamData.goalsAgainst;
     const goalDiffClass = goalDiff > 0 ? "positive" : goalDiff < 0 ? "negative" : "";
+    const positionChange = getPositionChange(teamData);
+    const positionChangeMarkup = positionChange > 0
+        ? `<span class="position-change up" title="Stijger (+${positionChange})" aria-label="Stijger ${positionChange} plaats${positionChange > 1 ? "en" : ""}">▲</span>`
+        : positionChange < 0
+            ? `<span class="position-change down" title="Zakker (${positionChange})" aria-label="Zakker ${Math.abs(positionChange)} plaats${Math.abs(positionChange) > 1 ? "en" : ""}">▼</span>`
+            : "";
 
     row.innerHTML = `
-        <td class="position center">${teamData.position}</td>
+        <td class="position center"><span class="position-wrap">${teamData.position}${positionChangeMarkup}</span></td>
         <td class="team">${teamData.team}</td>
         <td class="center">${teamData.played}</td>
         <td class="center hide-mobile">${teamData.won}</td>
@@ -62,9 +73,11 @@ function switchKlassementTab(reeksId, tabButtons, tableWrappers) {
     tabButtons.forEach((button) => 
         button.classList.toggle("active", button.dataset.reeks === reeksId)
     );
-    tableWrappers.forEach((wrapper) => 
-        wrapper.classList.toggle("active", wrapper.id === `klassement-reeks-${reeksId}`)
-    );
+    tableWrappers.forEach((wrapper) => {
+        const isActive = wrapper.id === `klassement-reeks-${reeksId}`;
+        wrapper.classList.toggle("active", isActive);
+        wrapper.hidden = !isActive;
+    });
 }
 
 /**
@@ -121,6 +134,12 @@ export async function loadKlassement() {
             if (!button) return;
             switchKlassementTab(button.dataset.reeks, tabButtons, tableWrappers);
         });
+
+        const initialActiveButton = Array.from(tabButtons).find((button) => button.classList.contains("active"))
+            || tabButtons[0];
+        if (initialActiveButton) {
+            switchKlassementTab(initialActiveButton.dataset.reeks, tabButtons, tableWrappers);
+        }
 
     } catch (error) {
         console.error("Fout bij laden klassement:", error);
