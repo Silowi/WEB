@@ -1,6 +1,6 @@
 import { addClickListener } from "./utils.js";
 
-const MOBILE_BREAKPOINT = 768;
+const MOBILE_BREAKPOINT = 1024;
 
 export function initMobileMenu() {
     const menuBtn = document.querySelector(".header__menu-toggle");
