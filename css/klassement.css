@@ -29,24 +29,16 @@
 
 .klassement-tab-btn {
     padding: var(--spacing-small) var(--spacing-large);
-    background: #f0f0f0;
-    border: 2px solid #ddd;
     border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #444;
-    transition: all .2s ease;
 }
 
 .klassement-tab-btn:hover {
-    background: #e0e0e0;
+    transform: translateY(-1px);
 }
 
 .klassement-tab-btn.active {
-    background: var(--green);
     color: white;
-    border-color: var(--green);
+    box-shadow: 0 6px 18px rgba(66,126,78,0.22);
 }
 
 .klassement-table-wrapper {

@@ -24,8 +24,8 @@
     <section class="gallery-section page-section">
     <div class="gallery-container">
         <div class="gallery-filters">
-            <button class="filter-btn active" data-filter="all">Alle foto's</button>
-            <button class="filter-btn" data-filter="evenementen">Evenementen</button>
+            <button class="filter-btn active" type="button" data-filter="all">Alle foto's</button>
+            <button class="filter-btn" type="button" data-filter="evenementen">Evenementen</button>
         </div>
 
         <div class="gallery-grid">
@@ -62,12 +62,12 @@
   </section>
 
   <!-- Lightbox -->
-  <div id="lightbox" class="lightbox">
-      <button class="lightbox-close" aria-label="Sluiten">&times;</button>
-      <button class="lightbox-prev" aria-label="Vorige">
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Fotolightbox">
+      <button class="lightbox-close" type="button" aria-label="Sluiten">&times;</button>
+      <button class="lightbox-prev" type="button" aria-label="Vorige">
           <i class="fas fa-chevron-left"></i>
       </button>
-      <button class="lightbox-next" aria-label="Volgende">
+      <button class="lightbox-next" type="button" aria-label="Volgende">
           <i class="fas fa-chevron-right"></i>
       </button>
       <div class="lightbox-content">

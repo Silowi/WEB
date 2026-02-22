@@ -1,4 +1,4 @@
-import { addClickListener } from "./utils.js";
+import { addClickListener, getAssetPrefix } from "./utils.js";
 
 const MONTH_MAP = {
     Jan: 0,
@@ -35,6 +35,22 @@ const SELECTORS = {
 };
 
 const PERKEZ_URL = "https://www.perkez.be/verbondsbladen/";
+const UNKNOWN_DATE_TEXT = "Datum onbekend";
+
+function getTodayContext() {
+    const now = new Date();
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+
+    const noonToday = new Date(today);
+    noonToday.setHours(12, 0, 0, 0);
+
+    return {
+        now,
+        today,
+        isAfterNoon: now >= noonToday
+    };
+}
 
 /**
  * Maakt een result card element veilig aan (XSS-beschermd)
@@ -85,14 +101,17 @@ function parseVerbondsbladenFromHtml(html) {
         const parent = header.parentElement;
         const contentArea = header.closest('[class*="article"], [class*="post"], div');
 
-        let date = "Datum onbekend";
+        let date = UNKNOWN_DATE_TEXT;
         let pdfUrl = null;
 
         if (contentArea) {
             const dateEl = contentArea.querySelector("time");
             const extractedDate = contentArea.textContent.match(/\d{1,2}\s*\w+\s*\d{4}/);
-            if (dateEl?.textContent) date = dateEl.textContent.trim();
-            else if (extractedDate) date = extractedDate[0];
+            if (dateEl?.textContent) {
+                date = dateEl.textContent.trim();
+            } else if (extractedDate) {
+                date = extractedDate[0];
+            }
         }
 
         const directPdfLink = header.closest("div")?.querySelector('a[href*=".pdf"]')
@@ -111,7 +130,8 @@ function parseVerbondsbladenFromHtml(html) {
 }
 
 async function fetchViaProxy() {
-    const response = await fetch("/perkez-proxy.php", { cache: "no-store" });
+    const apiPath = `${getAssetPrefix()}api/perkez-proxy.php`;
+    const response = await fetch(apiPath, { cache: "no-store" });
     if (!response.ok) throw new Error("Proxy niet beschikbaar");
     const json = await response.json();
     if (!Array.isArray(json) || !json.length) throw new Error("Proxy leverde geen items");
@@ -141,6 +161,7 @@ export async function loadVerbondsbladen() {
 
     const loadingEl = document.querySelector(SELECTORS.loading);
     const errorEl = document.querySelector(SELECTORS.error);
+    const errorTextEl = document.querySelector("#results-error-text");
     const retryBtn = document.querySelector(SELECTORS.retry);
 
     errorEl?.classList.add("is-hidden");
@@ -163,6 +184,9 @@ export async function loadVerbondsbladen() {
     } catch (error) {
         console.error("Verbondsbladen laden faalde, dummy-data getoond.", error);
         if (errorEl) errorEl.classList.remove("is-hidden");
+        if (errorTextEl) {
+            errorTextEl.textContent = "Live data tijdelijk niet beschikbaar. Tijdelijke gegevens worden getoond.";
+        }
         renderResultCards(container, DUMMY_VERBONDSBLADEN);
     } finally {
         if (loadingEl) {
@@ -242,12 +266,7 @@ function updateLoadMoreButtonState(activeTeamElement) {
     const loadMoreButton = document.querySelector("#calendar-load-more");
     if (!loadMoreButton || !activeTeamElement) return;
 
-    const now = new Date();
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-    const noonToday = new Date(today);
-    noonToday.setHours(12, 0, 0, 0);
-    const isAfterNoon = now >= noonToday;
+    const { today, isAfterNoon } = getTodayContext();
 
     const activeTeamId = getTeamIdFromElement(activeTeamElement);
     const visibleCount = visibleMatchesPerTeam.get(activeTeamId) || INITIAL_VISIBLE_MATCHES;
@@ -261,12 +280,7 @@ function updateLoadMoreButtonState(activeTeamElement) {
  * Verbergt voorbije wedstrijden en ongeldige datums
  */
 function filterUpcomingMatches(calendarTeams) {
-    const now = new Date();
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-    const noonToday = new Date(today);
-    noonToday.setHours(12, 0, 0, 0);
-    const isAfterNoon = now >= noonToday;
+    const { today, isAfterNoon } = getTodayContext();
 
     calendarTeams.forEach((team) => {
         const { events, upcoming } = getUpcomingEventsForTeam(team, today, isAfterNoon);
@@ -345,7 +359,7 @@ export function initCalendarTabs() {
     const teamParam = new URLSearchParams(window.location.search).get("team");
     if (teamParam) {
         // Sta enkel geldige team ID's toe die bestaan in de DOM 
-        const validTeams = Array.from(tabButtons).map(btn => btn.dataset.team);
+        const validTeams = Array.from(tabButtons).map((btn) => btn.dataset.team);
         if (validTeams.includes(teamParam)) {
             const targetButton = Array.from(tabButtons).find((button) => button.dataset.team === teamParam);
             if (targetButton) targetButton.click();

@@ -1,11 +1,13 @@
 import { addClickListener } from "./utils.js";
 
 /**
- * Laad en toon klassement data uit JSON bestand
- * Gebruikt lokale data die handmatig wordt geüpdatet
+ * Laad en toon klassement data uit JSON bestand.
+ * Gebruikt lokale data die handmatig wordt geupdatet.
  */
-
 const KLASSEMENT_DATA_PATH = "../data/klassement.json";
+const OWN_TEAM_MATCHERS = ["Ettelgem", "KVK"];
+const POSITION_ICON_UP = "&#9650;";
+const POSITION_ICON_DOWN = "&#9660;";
 
 function getPositionChange(teamData) {
     if (typeof teamData.previousPosition !== "number") return 0;
@@ -13,7 +15,7 @@ function getPositionChange(teamData) {
 }
 
 /**
- * Maak een tabel rij voor één team aan
+ * Maak een tabelrij voor een team aan.
  */
 function createTableRow(teamData, isOwnTeam = false) {
     const row = document.createElement("tr");
@@ -23,9 +25,9 @@ function createTableRow(teamData, isOwnTeam = false) {
     const goalDiffClass = goalDiff > 0 ? "positive" : goalDiff < 0 ? "negative" : "";
     const positionChange = getPositionChange(teamData);
     const positionChangeMarkup = positionChange > 0
-        ? `<span class="position-change up" title="Stijger (+${positionChange})" aria-label="Stijger ${positionChange} plaats${positionChange > 1 ? "en" : ""}">▲</span>`
+        ? `<span class="position-change up" title="Stijger (+${positionChange})" aria-label="Stijger ${positionChange} plaats${positionChange > 1 ? "en" : ""}">${POSITION_ICON_UP}</span>`
         : positionChange < 0
-            ? `<span class="position-change down" title="Zakker (${positionChange})" aria-label="Zakker ${Math.abs(positionChange)} plaats${Math.abs(positionChange) > 1 ? "en" : ""}">▼</span>`
+            ? `<span class="position-change down" title="Zakker (${positionChange})" aria-label="Zakker ${Math.abs(positionChange)} plaats${Math.abs(positionChange) > 1 ? "en" : ""}">${POSITION_ICON_DOWN}</span>`
             : "";
 
     row.innerHTML = `
@@ -37,7 +39,7 @@ function createTableRow(teamData, isOwnTeam = false) {
         <td class="center hide-mobile">${teamData.lost}</td>
         <td class="center hide-mobile">${teamData.goalsFor}</td>
         <td class="center hide-mobile">${teamData.goalsAgainst}</td>
-        <td class="center goal-diff ${goalDiffClass}">${goalDiff > 0 ? '+' : ''}${goalDiff}</td>
+        <td class="center goal-diff ${goalDiffClass}">${goalDiff > 0 ? "+" : ""}${goalDiff}</td>
         <td class="center points">${teamData.points}</td>
     `;
 
@@ -45,13 +47,13 @@ function createTableRow(teamData, isOwnTeam = false) {
 }
 
 /**
- * Render klassement tabel voor specifieke reeks
+ * Render klassement tabel voor specifieke reeks.
  * Reeks 1 = 78 & 82 (zelfde competitie)
  * Reeks 2 = 68 (aparte competitie)
  */
 function renderKlassementTable(standings, reeksId) {
     const wrapper = document.querySelector(`#klassement-reeks-${reeksId}`);
-    if (!wrapper) return;
+    if (!wrapper || !Array.isArray(standings)) return;
 
     const tbody = wrapper.querySelector("tbody");
     if (!tbody) return;
@@ -59,18 +61,17 @@ function renderKlassementTable(standings, reeksId) {
     tbody.innerHTML = "";
 
     standings.forEach((teamData) => {
-        const isOwnTeam = teamData.team.includes("Ettelgem") || 
-                          teamData.team.includes("KVK");
+        const isOwnTeam = OWN_TEAM_MATCHERS.some((matcher) => teamData.team.includes(matcher));
         const row = createTableRow(teamData, isOwnTeam);
         tbody.appendChild(row);
     });
 }
 
 /**
- * Wissel tussen verschillende klassement tabs (reeksen)
+ * Wissel tussen verschillende klassement tabs (reeksen).
  */
 function switchKlassementTab(reeksId, tabButtons, tableWrappers) {
-    tabButtons.forEach((button) => 
+    tabButtons.forEach((button) =>
         button.classList.toggle("active", button.dataset.reeks === reeksId)
     );
     tableWrappers.forEach((wrapper) => {
@@ -87,7 +88,7 @@ function mapTeamToReeks(teamId) {
 }
 
 /**
- * Update de "laatst bijgewerkt" datum
+ * Update de "laatst bijgewerkt" datum.
  */
 function updateLastUpdatedDate(dateString) {
     const element = document.querySelector(".klassement-last-updated");
@@ -101,13 +102,13 @@ function updateLastUpdatedDate(dateString) {
             year: "numeric"
         });
         element.textContent = `Laatst bijgewerkt: ${formatted}`;
-    } catch (error) {
+    } catch {
         element.textContent = `Laatst bijgewerkt: ${dateString}`;
     }
 }
 
 /**
- * Laad klassement data en initialiseer tabs
+ * Laad klassement data en initialiseer tabs.
  */
 export async function loadKlassement() {
     const section = document.querySelector(".klassement-section");
@@ -119,18 +120,15 @@ export async function loadKlassement() {
 
         const data = await response.json();
 
-        // Update laatste wijzigingsdatum
         if (data.lastUpdated) {
             updateLastUpdatedDate(data.lastUpdated);
         }
 
-        // Render klassementen
-        // Reeks 1: teams 78 & 82 spelen in dezelfde competitie
-        // Reeks 2: team 68 speelt in een aparte competitie
-        renderKlassementTable(data.teams["78"], "1"); // 78 en 82 hebben zelfde klassement
+        // Reeks 1: teams 78 & 82 spelen in dezelfde competitie.
+        // Reeks 2: team 68 speelt in een aparte competitie.
+        renderKlassementTable(data.teams["78"], "1");
         renderKlassementTable(data.teams["68"], "2");
 
-        // Initialiseer tab switching
         const tabButtons = document.querySelectorAll(".klassement-tab-btn");
         const tableWrappers = document.querySelectorAll(".klassement-table-wrapper");
 
@@ -150,18 +148,14 @@ export async function loadKlassement() {
         if (initialReeks) {
             switchKlassementTab(initialReeks, tabButtons, tableWrappers);
         }
-
     } catch (error) {
         console.error("Fout bij laden klassement:", error);
-        // Toon vriendelijke foutmelding
-        const section = document.querySelector(".klassement-section");
-        if (section) {
-            const errorDiv = document.createElement("div");
-            errorDiv.className = "results-error";
-            errorDiv.innerHTML = `
-                <p>Klassement tijdelijk niet beschikbaar. Probeer later opnieuw.</p>
-            `;
-            section.appendChild(errorDiv);
-        }
+
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "results-error";
+        errorDiv.innerHTML = `
+            <p>Klassement tijdelijk niet beschikbaar. Probeer later opnieuw.</p>
+        `;
+        section.appendChild(errorDiv);
     }
 }

@@ -1,3 +1,5 @@
+import { getAssetPrefix } from "./utils.js";
+
 const NAV_ITEMS = [
     { page: "home", label: "Home", href: "index.html" },
     { page: "kalender", label: "Kalender", href: "pages/kalender.html" },
@@ -6,9 +8,6 @@ const NAV_ITEMS = [
     { page: "gallerij", label: "Foto's", href: "pages/gallerij.html" },
     { page: "contact", label: "Contact", href: "pages/contact.html" }
 ];
-
-const getAssetPrefix = () =>
-    window.location.pathname.toLowerCase().includes("/pages/") ? "../" : "";
 
 export function renderSharedHeader() {
     const header = document.querySelector("header.header");

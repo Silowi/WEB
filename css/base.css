@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&family=Poppins:wght@300;400;600;700&display=swap');
+
+:root {
+    --green: #427e4e;
+    --green-dark: #2f5f39;
+    --dark: #1e1e1e;
+    --surface: #ffffff;
+    --muted: #f4f4f4;
+    --border: rgba(0,0,0,0.08);
+    --text-muted: #5a5a5a;
+    --spacing-tight: 0.8rem;
+    --spacing-small: 1.4rem;
+    --spacing-medium: 2.4rem;
+    --spacing-large: 4rem;
+    --spacing-xl: 5.6rem;
+    --spacing-xxl: 7rem;
+    --radius-pill: 999px;
+    --radius-card: 18px;
+    --radius-button: 30px;
+    --shadow-soft: 0 6px 18px rgba(0,0,0,0.08);
+    --shadow-card: 0 12px 28px rgba(66,126,78,0.25);
+    --shadow-cta: 0 6px 20px rgba(66,126,78,0.2);
+    --white-translucent: rgba(255,255,255,0.55);
+    --white-opaque: rgba(255,255,255,0.95);
+    --white-soft: rgba(255,255,255,0.25);
+    --white-faint: rgba(255,255,255,0.15);
+    --menu-overlay: rgba(30,30,30,0.94);
+    --hero-overlay: rgba(20,83,45,0.85);
+    --border-muted: rgba(255,255,255,0.2);
+    --green-fade: rgba(66,126,78,0.08);
+    --green-highlight: rgba(66,126,78,0.12);
+    --danger: #c62828;
+    --success: #2e7d32;
+}
+
+*{
+    font-family: 'Manrope', 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+html {
+    font-size: 62.5%;
+    scroll-behavior: smooth;
+    scroll-padding-top: 8rem;
+}
+
+body{
+    background: linear-gradient(180deg, #f8fbf7 0%, #f3f5f2 60%, #edf0ed 100%);
+    min-height: 100vh;
+    padding-top: var(--spacing-small);
+    color: var(--dark);
+    font-family: 'Manrope', 'Poppins', sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.68;
+    overflow-x: hidden;
+}
+
+body h1,
+body h2,
+body h3{
+    font-family: 'Sora', 'Manrope', sans-serif;
+    letter-spacing: .05em;
+}
+
+.btn-primary{
+    padding: var(--spacing-small) var(--spacing-xl);
+    background: var(--surface);
+    color: var(--green-dark);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    border-radius: var(--radius-pill);
+    font-family: 'Sora', 'Manrope', sans-serif;
+    border: none;
+    box-shadow: var(--shadow-cta);
+}

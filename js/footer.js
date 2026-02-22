@@ -1,3 +1,5 @@
+import { getAssetPrefix } from "./utils.js";
+
 const EMAIL_ADDRESS = "drukkerij.devlieghere@skynet.be";
 
 const SPONSOR_IMAGES = [
@@ -6,9 +8,6 @@ const SPONSOR_IMAGES = [
     "img/Sponser5.JPG",
     "img/Sponser6.jpg"
 ];
-
-const getAssetPrefix = () =>
-    window.location.pathname.toLowerCase().includes("/pages/") ? "../" : "";
 
 export function renderSharedFooter() {
     const footer = document.querySelector("footer.footer");

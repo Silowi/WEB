@@ -51,7 +51,7 @@ Upload deze bestanden:
 - `/pages/contact.html`
 - `/css/contact.css`
 - `/js/contact.js`
-- `/contact-handler.php`
+- `/api/contact-handler.php`
 
 **Let op:** Je server moet PHP en `mail()` functie ondersteunen.
 
@@ -89,7 +89,7 @@ Als `mail()` niet werkt, gebruik Formspree:
    ```html
    <form id="contact-form" class="contact-form" method="POST" action="https://formspree.io/f/JOUWID">
    ```
-6. Verwijder of negeer `contact-handler.php`
+6. Verwijder of negeer `api/contact-handler.php`
 
 Klaar! Werkt zonder PHP configuratie.
 

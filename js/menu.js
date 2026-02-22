@@ -1,6 +1,19 @@
 import { addClickListener } from "./utils.js";
 
 const MOBILE_BREAKPOINT = 1024;
+const PATH_PAGE_MAP = [
+    ["/pages/kalender.html", "kalender"],
+    ["/pages/uitslagen.html", "uitslagen"],
+    ["/pages/evenementen.html", "evenementen"],
+    ["/pages/gallerij.html", "gallerij"],
+    ["/pages/contact.html", "contact"]
+];
+
+function resolveCurrentPage(pathname) {
+    const path = pathname.toLowerCase();
+    const entry = PATH_PAGE_MAP.find(([match]) => path.includes(match));
+    return entry ? entry[1] : "home";
+}
 
 export function initMobileMenu() {
     const menuBtn = document.querySelector(".header__menu-toggle");
@@ -37,18 +50,7 @@ export function setActiveNavLink() {
     const navLinks = document.querySelectorAll(".header .header__link[data-page]");
     if (!navLinks.length) return;
 
-    const path = window.location.pathname.toLowerCase();
-    const currentPage = path.includes("/pages/kalender.html")
-        ? "kalender"
-        : path.includes("/pages/uitslagen.html")
-            ? "uitslagen"
-            : path.includes("/pages/evenementen.html")
-                ? "evenementen"
-                : path.includes("/pages/gallerij.html")
-                    ? "gallerij"
-                    : path.includes("/pages/contact.html")
-                        ? "contact"
-                        : "home";
+    const currentPage = resolveCurrentPage(window.location.pathname);
 
     navLinks.forEach((link) => {
         const isActive = link.dataset.page === currentPage;

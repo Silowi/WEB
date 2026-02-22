@@ -16,26 +16,17 @@
 
 .filter-btn {
     padding: 1.2rem 2.5rem;
-    background: #f0f0f0;
-    border: 2px solid #ddd;
     border-radius: 30px;
-    cursor: pointer;
     font-size: 1.5rem;
-    font-weight: 600;
-    color: #444;
-    transition: all 0.3s ease;
-    font-family: 'Sora', 'Manrope', sans-serif;
+    transition-duration: 0.3s;
 }
 
 .filter-btn:hover {
-    background: #e0e0e0;
     transform: translateY(-2px);
 }
 
 .filter-btn.active {
-    background: var(--green);
-    color: white;
-    border-color: var(--green);
+    color: #fff;
     box-shadow: 0 6px 20px rgba(66, 126, 78, 0.25);
 }
 

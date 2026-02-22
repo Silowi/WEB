@@ -11,6 +11,8 @@ const MIN_MESSAGE_LENGTH = 10;
  */
 function validateField(field) {
     const formGroup = field.closest(".form-group");
+    if (!formGroup) return true;
+
     const errorMessage = formGroup.querySelector(".error-message");
     const value = field.value.trim();
     let error = "";
@@ -27,12 +29,12 @@ function validateField(field) {
 
     if (error) {
         formGroup.classList.add("error");
-        errorMessage.textContent = error;
+        if (errorMessage) errorMessage.textContent = error;
         return false;
     }
 
     formGroup.classList.remove("error");
-    errorMessage.textContent = "";
+    if (errorMessage) errorMessage.textContent = "";
     return true;
 }
 
@@ -76,16 +78,18 @@ function showFormMessage(form, message, type) {
  * Toggle submit button loading state
  */
 function setSubmitLoading(button, isLoading) {
+    if (!button) return;
+
     const btnText = button.querySelector(".btn-text");
     const btnLoading = button.querySelector(".btn-loading");
 
     if (isLoading) {
-        btnText.classList.add("is-hidden");
-        btnLoading.classList.remove("is-hidden");
+        if (btnText) btnText.classList.add("is-hidden");
+        if (btnLoading) btnLoading.classList.remove("is-hidden");
         button.disabled = true;
     } else {
-        btnText.classList.remove("is-hidden");
-        btnLoading.classList.add("is-hidden");
+        if (btnText) btnText.classList.remove("is-hidden");
+        if (btnLoading) btnLoading.classList.add("is-hidden");
         button.disabled = false;
     }
 }
@@ -152,7 +156,7 @@ export function initContactForm() {
         // Verwijder error bij typen
         field.addEventListener("input", () => {
             const formGroup = field.closest(".form-group");
-            if (formGroup.classList.contains("error")) {
+            if (formGroup?.classList.contains("error")) {
                 validateField(field);
             }
         });
