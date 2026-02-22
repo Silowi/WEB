@@ -1,4 +1,4 @@
-import { addClickListener, getAssetPrefix } from "./utils.js";
+import { addClickListener } from "./utils.js";
 
 const MONTH_MAP = {
     Jan: 0,
@@ -31,6 +31,11 @@ const SELECTORS = {
     error: "#results-error",
     retry: "#results-retry"
 };
+const PROXY_ENDPOINTS = [
+    "/.netlify/functions/perkez-proxy",
+    "/api/perkez-proxy.php",
+    "../api/perkez-proxy.php"
+];
 
 const PERKEZ_URL = "https://www.perkez.be/verbondsbladen/";
 const UNKNOWN_DATE_TEXT = "Datum onbekend";
@@ -128,12 +133,23 @@ function parseVerbondsbladenFromHtml(html) {
 }
 
 async function fetchViaProxy() {
-    const apiPath = `${getAssetPrefix()}api/perkez-proxy.php`;
-    const response = await fetch(apiPath, { cache: "no-store" });
-    if (!response.ok) throw new Error("Proxy niet beschikbaar");
-    const json = await response.json();
-    if (!Array.isArray(json) || !json.length) throw new Error("Proxy leverde geen items");
-    return json;
+    for (const endpoint of PROXY_ENDPOINTS) {
+        try {
+            const response = await fetch(endpoint, { cache: "no-store" });
+            if (!response.ok) {
+                continue;
+            }
+
+            const json = await response.json();
+            if (Array.isArray(json) && json.length) {
+                return json.slice(0, MAX_VERBONDSBLADEN);
+            }
+        } catch {
+            // Try next proxy endpoint
+        }
+    }
+
+    throw new Error("Proxy niet beschikbaar");
 }
 
 async function fetchViaAllOrigins() {
