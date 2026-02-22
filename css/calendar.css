@@ -1,0 +1,360 @@
+.results-hero{
+    min-height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(20,83,45,.9), rgba(66,126,78,.9)), url("../img/78.jpg") center/cover no-repeat;
+}
+
+.uitslagen{
+    padding: var(--spacing-large) 9%;
+    background: rgba(255,255,255,0.96);
+    border-radius: 28px;
+    box-shadow: 0 26px 52px rgba(0,0,0,0.08);
+}
+
+.uitslagen-content{
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.intro-text{
+    font-size: 1.6rem;
+    color: #555;
+    margin-bottom: 4rem;
+    line-height: 1.8;
+    text-align: center;
+}
+
+.results-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.result-card{
+    background: var(--surface);
+    padding: 2.6rem;
+    border-radius: 16px;
+    border-left: 6px solid var(--green);
+    border: 1px solid var(--border);
+    box-shadow: 0 16px 28px rgba(0,0,0,.08);
+    transition: all .2s ease;
+}
+
+.result-card:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 22px 36px rgba(0,0,0,.12);
+}
+
+.result-card .date{
+    font-size: 1.3rem;
+    color: var(--green);
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+}
+
+.result-card .title{
+    font-size: 1.7rem;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.result-card a{
+    display: inline-block;
+    color: white;
+    background: var(--green);
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.4rem;
+    transition: background .2s ease;
+}
+
+.result-card a:hover{
+    background: #35633e;
+}
+
+.results-cta{
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 3rem;
+    border-top: 2px dashed rgba(0,0,0,0.08);
+}
+
+.results-cta .btn-primary,
+.results-cta .btn-primary:visited{
+    background: var(--green);
+    color: #fff;
+    padding: 1.2rem 3rem;
+    border-radius: 30px;
+    display: inline-block;
+    font-weight: 700;
+    box-shadow: 0 .4rem .8rem rgba(0,0,0,.08);
+    text-decoration: none;
+}
+
+.results-cta .btn-primary:hover{
+    background: #35633e;
+    transform: translateY(-2px);
+}
+
+.results-loading{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 0;
+}
+
+.spinner{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: var(--green);
+    animation: spin 1s linear infinite;
+    background: transparent;
+}
+
+@keyframes spin{
+    to { transform: rotate(360deg); }
+}
+
+.results-loading .loading-text{
+    font-size: 1.6rem;
+    color: #444;
+}
+
+.results-error{
+    background: #fff3f3;
+    border: 1px solid #f1c2c2;
+    color: #8a1f1f;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.results-error p{
+    margin-bottom: 1rem;
+}
+
+.results-error .btn-primary{
+    background: var(--green);
+    color: white;
+}
+
+@media (max-width: 768px){
+    .calendar-tabs{
+        flex-direction: column;
+    }
+
+    .tab-btn{
+        width: 100%;
+    }
+
+    .calendar-event{
+        flex-direction: column;
+    }
+
+    .cal-date{
+        width: 100%;
+        min-width: unset;
+    }
+
+    .calendar-grid{
+        grid-template-columns: 1fr;
+    }
+}
+
+.calendar-tabs{
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn{
+    padding: 1rem 2rem;
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #444;
+    transition: all .2s ease;
+}
+
+.tab-btn:hover{
+    background: #e0e0e0;
+}
+
+.tab-btn.active{
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+}
+
+.calendar-team{
+    display: none;
+}
+
+.calendar-team.active{
+    display: block;
+}
+
+.calendar-team h3{
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.calendar-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.calendar-event{
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 2.5rem;
+    display: flex;
+    gap: 1.5rem;
+    border-left: 6px solid var(--green);
+    box-shadow: 0 18px 30px rgba(0,0,0,0.08);
+    transition: all .2s ease;
+}
+
+.calendar-event:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 24px 40px rgba(0,0,0,0.12);
+}
+
+.cal-date{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    background: var(--green);
+    color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.cal-day{
+    font-size: 2rem;
+}
+
+.cal-month{
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    margin-top: .3rem;
+}
+
+.cal-info{
+    flex: 1;
+}
+
+.cal-teams{
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: .5rem;
+}
+
+.home-away{
+    display: inline-block;
+    background: #e8f5e9;
+    color: var(--green);
+    padding: .3rem .8rem;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-left: .5rem;
+}
+
+.home-away.away{
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.cal-opponent{
+    font-size: 1.5rem;
+    color: var(--green);
+    font-weight: 600;
+    margin-bottom: .5rem;
+}
+
+.cal-location{
+    font-size: 1.3rem;
+    color: #666;
+    margin-bottom: .3rem;
+}
+
+.cal-time{
+    font-size: 1.2rem;
+    color: #999;
+    font-weight: 500;
+}
+
+.calendar-pdf-section{
+    margin-top: 5rem;
+    padding-top: 3rem;
+    border-top: 2px solid #eee;
+}
+
+.calendar-pdf-section h3{
+    font-size: 2.2rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.calendar-pdf-section > p{
+    font-size: 1.5rem;
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+.calendar-pdf-viewer{
+    background: #f9f9f9;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.pdf-embed{
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px){
+    #pdf-viewer-desktop{
+        display: none;
+    }
+}
+
+@media (max-width: 600px){
+    .uitslagen{
+        padding: 4rem 6%;
+        border-radius: 20px;
+    }
+
+    .calendar-event{
+        padding: 2rem;
+    }
+}
