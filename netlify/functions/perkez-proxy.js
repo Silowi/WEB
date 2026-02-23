@@ -103,7 +103,7 @@ function filterScoreLine(rawLine) {
     if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(line)) return null;
     if (/\b(straat|laan|weg|plein|bus|nr\.?|nummer|koekelare|oudenburg)\b/i.test(line)) return null;
     if (/\b\d{4}\b/.test(line)) return null;
-    if (!/\b[A-Za-z]{2,}\b.*\d{1,2}\s*[-:]\s*\d{1,2}.*\b[A-Za-z]{2,}\b/.test(line)) return null;
+    if (!/\b[A-Za-z]{2,}.*\d{1,2}\s*[-:]\s*\d{1,2}(?:\b|$)/.test(line)) return null;
     if (/^(www\.|http|koninklijke|wekelijks|officieel|verbondsorgaan)/i.test(line)) return null;
     return line;
 }
