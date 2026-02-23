@@ -20,6 +20,39 @@
     font-style: italic;
 }
 
+.verbondsblad-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green);
+    border-radius: var(--radius-card);
+    padding: var(--spacing-medium) var(--spacing-large);
+    margin-bottom: var(--spacing-large);
+    box-shadow: var(--shadow-soft);
+}
+
+.verbondsblad-summary h4 {
+    font-size: 1.7rem;
+    margin-bottom: var(--spacing-small);
+    color: var(--dark);
+}
+
+.verbondsblad-summary ul {
+    margin: 0;
+    padding-left: 2rem;
+}
+
+.verbondsblad-summary li {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: var(--dark);
+}
+
+.verbondsblad-summary-empty {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--text-muted);
+}
+
 .klassement-tabs {
     display: flex;
     gap: var(--spacing-small);
