@@ -1,5 +1,6 @@
 const TARGET_URL = "https://www.perkez.be/verbondsbladen/";
 const UNKNOWN_DATE = "Datum onbekend";
+const SCORE_PATTERN = /\b\d{1,2}\s*[-:]\s*\d{1,2}\b/;
 
 function jsonResponse(statusCode, payload) {
     return {
@@ -27,6 +28,29 @@ function stripHtml(input) {
 function normalizePdfUrl(href) {
     if (/^https?:\/\//i.test(href)) return href;
     return `https://www.perkez.be/${href.replace(/^\/+/, "")}`;
+}
+
+function extractResultsSummary(sectionHtml) {
+    const lineRegex = /<(?:li|p|td|div|span)[^>]*>([\s\S]{0,260})<\/(?:li|p|td|div|span)>/gi;
+    const seen = new Set();
+    const lines = [];
+    let match;
+
+    while ((match = lineRegex.exec(sectionHtml)) !== null) {
+        const line = stripHtml(match[1]);
+        if (!line) continue;
+        if (!SCORE_PATTERN.test(line)) continue;
+        if (!/[A-Za-zÀ-ÿ]/.test(line)) continue;
+
+        const normalized = line.replace(/\s+/g, " ").trim();
+        if (seen.has(normalized)) continue;
+        seen.add(normalized);
+        lines.push(normalized);
+
+        if (lines.length >= 8) break;
+    }
+
+    return lines;
 }
 
 function extractDate(text, num) {
@@ -71,6 +95,7 @@ function parseLatestVerbondsblad(html) {
         const section = html.slice(latest.index, nextHeadingIndex ?? latest.index + 4000);
         const text = stripHtml(section);
         const date = extractDate(text, latest.number);
+        const resultsSummary = extractResultsSummary(section);
         const linkMatch = section.match(/href=["']([^"']*Nr-\d+\.pdf[^"']*)["']/i);
         const url = normalizePdfUrl(
             linkMatch?.[1] ?? `https://www.perkez.be/website/wp-content/uploads/Nr-${latest.number}.pdf`
@@ -80,7 +105,9 @@ function parseLatestVerbondsblad(html) {
             {
                 title: `Verbondsblad ${latest.number}`,
                 date,
-                url
+                url,
+                resultsSummary,
+                resultsSummaryText: resultsSummary.join(" | ")
             }
         ];
     }
@@ -96,7 +123,9 @@ function parseLatestVerbondsblad(html) {
         {
             title: `Verbondsblad ${best.number}`,
             date: UNKNOWN_DATE,
-            url: normalizePdfUrl(best.url)
+            url: normalizePdfUrl(best.url),
+            resultsSummary: [],
+            resultsSummaryText: ""
         }
     ];
 }

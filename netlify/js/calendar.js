@@ -20,7 +20,17 @@ const LOAD_MORE_STEP = 3;
 const visibleMatchesPerTeam = new Map();
 
 const DUMMY_VERBONDSBLADEN = [
-    { title: "Verbondsblad Nr. 1599", date: "17 februari 2026", url: "https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf" }
+    {
+        title: "Verbondsblad Nr. 1599",
+        date: "17 februari 2026",
+        url: "https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf",
+        resultsSummary: [
+            "Ettelgem 78 - Bekegem 2-1",
+            "Ettelgem 82 - De Merci 1-1",
+            "Ettelgem 68 - Vertex 3-0"
+        ],
+        resultsSummaryText: "Ettelgem 78 - Bekegem 2-1 | Ettelgem 82 - De Merci 1-1 | Ettelgem 68 - Vertex 3-0"
+    }
 ];
 
 const MAX_VERBONDSBLADEN = 1;
@@ -37,6 +47,16 @@ const PROXY_ENDPOINTS = [
 
 const PERKEZ_URL = "https://www.perkez.be/verbondsbladen/";
 const UNKNOWN_DATE_TEXT = "Datum onbekend";
+
+function isSafeExternalUrl(url) {
+    if (typeof url !== "string") return false;
+    try {
+        const parsed = new URL(url, window.location.origin);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+        return false;
+    }
+}
 
 function getTodayContext() {
     const now = new Date();
@@ -70,7 +90,7 @@ function createResultCard(item) {
     titleDiv.textContent = item.title;
 
     const link = document.createElement("a");
-    link.href = item.url; // Browsers saneren href automatisch
+    link.href = isSafeExternalUrl(item.url) ? item.url : PERKEZ_URL;
     link.target = "_blank";
     link.rel = "noreferrer";
     link.textContent = "PDF Downloaden";
@@ -80,6 +100,35 @@ function createResultCard(item) {
     card.appendChild(link);
 
     return card;
+}
+
+function renderLatestResultsSummary(items) {
+    const wrapper = document.querySelector("#verbondsblad-summary");
+    const list = document.querySelector("#verbondsblad-summary-list");
+    const emptyText = document.querySelector("#verbondsblad-summary-empty");
+    if (!wrapper || !list || !emptyText) return;
+
+    list.innerHTML = "";
+    const firstItem = Array.isArray(items) && items.length ? items[0] : null;
+    const summaryLines = Array.isArray(firstItem?.resultsSummary)
+        ? firstItem.resultsSummary.filter((line) => typeof line === "string" && line.trim() !== "")
+        : [];
+
+    if (!summaryLines.length) {
+        emptyText.classList.remove("is-hidden");
+        wrapper.classList.remove("is-hidden");
+        return;
+    }
+
+    emptyText.classList.add("is-hidden");
+    const fragment = document.createDocumentFragment();
+    summaryLines.forEach((line) => {
+        const li = document.createElement("li");
+        li.textContent = line;
+        fragment.appendChild(li);
+    });
+    list.appendChild(fragment);
+    wrapper.classList.remove("is-hidden");
 }
 
 function renderResultCards(container, items) {
@@ -193,6 +242,7 @@ export async function loadVerbondsbladen() {
         const verbondsbladen = await fetchVerbondsbladen();
         if (!verbondsbladen.length) throw new Error("Geen verbondsbladen gevonden");
         renderResultCards(container, verbondsbladen);
+        renderLatestResultsSummary(verbondsbladen);
     } catch (error) {
         console.error("Verbondsbladen laden faalde, dummy-data getoond.", error);
         if (errorEl) errorEl.classList.remove("is-hidden");
@@ -200,6 +250,7 @@ export async function loadVerbondsbladen() {
             errorTextEl.textContent = "Live data tijdelijk niet beschikbaar. Tijdelijke gegevens worden getoond.";
         }
         renderResultCards(container, DUMMY_VERBONDSBLADEN);
+        renderLatestResultsSummary(DUMMY_VERBONDSBLADEN);
     } finally {
         if (loadingEl) {
             loadingEl.classList.add("is-hidden");
