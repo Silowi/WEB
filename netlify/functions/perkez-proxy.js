@@ -198,34 +198,13 @@ function extractResultsByReeksFromPdfText(pdfText) {
 
     const lines = pdfText.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
     const seen = { reeks1: new Set(), reeks2: new Set() };
-    let inResults = false;
-    let activeReeks = null;
 
     for (const rawLine of lines) {
-        const normalized = rawLine.toLowerCase();
-
-        if (normalized.includes("uitslagen")) {
-            inResults = true;
-            activeReeks = "reeks1";
-            continue;
-        }
-        if (!inResults) continue;
-        if (normalized.includes("klassement")) break;
-
-        if (REEKS1_MARKERS.some((marker) => marker.test(normalized))) {
-            activeReeks = "reeks1";
-            continue;
-        }
-        if (REEKS2_MARKERS.some((marker) => marker.test(normalized))) {
-            activeReeks = "reeks2";
-            continue;
-        }
-
         const scoreLine = filterScoreLine(rawLine);
         if (!scoreLine) continue;
 
-        const classifiedReeks = classifyLineReeks(scoreLine);
-        const targetReeks = classifiedReeks || activeReeks;
+        // Only keep lines we can map to a known team from the standings.
+        const targetReeks = classifyLineReeks(scoreLine);
         if (!targetReeks) continue;
         if (seen[targetReeks].has(scoreLine)) continue;
         seen[targetReeks].add(scoreLine);
@@ -463,6 +442,7 @@ exports.handler = async (event) => {
         });
     }
 };
+
 
 
 
