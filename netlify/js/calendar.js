@@ -105,9 +105,10 @@ function createResultCard(item) {
 function renderLatestResultsSummary(items) {
     const wrapper = document.querySelector("#verbondsblad-summary");
     const title = document.querySelector("#verbondsblad-summary-title");
+    const updated = document.querySelector("#verbondsblad-summary-updated");
     const activeList = document.querySelector("#verbondsblad-summary-list-active");
     const emptyText = document.querySelector("#verbondsblad-summary-empty");
-    if (!wrapper || !title || !activeList || !emptyText) return;
+    if (!wrapper || !title || !updated || !activeList || !emptyText) return;
 
     activeList.innerHTML = "";
     const firstItem = Array.isArray(items) && items.length ? items[0] : null;
@@ -132,6 +133,7 @@ function renderLatestResultsSummary(items) {
 
     emptyText.classList.add("is-hidden");
     wrapper.classList.remove("is-hidden");
+    updated.textContent = `Laatst bijgewerkt: ${firstItem?.date || UNKNOWN_DATE_TEXT}`;
 
     const renderForReeks = (reeksId) => {
         const lines = linesByReeks[reeksId] || [];
@@ -139,18 +141,22 @@ function renderLatestResultsSummary(items) {
         activeList.innerHTML = "";
 
         if (!lines.length) {
-            const li = document.createElement("li");
-            li.className = "summary-empty-line";
-            li.textContent = "Geen nieuwe uitslagen in dit verbondsblad.";
-            activeList.appendChild(li);
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.className = "summary-empty-line";
+            td.textContent = "Geen nieuwe uitslagen in dit verbondsblad.";
+            tr.appendChild(td);
+            activeList.appendChild(tr);
             return;
         }
 
         const fragment = document.createDocumentFragment();
         lines.forEach((line) => {
-            const li = document.createElement("li");
-            li.textContent = line;
-            fragment.appendChild(li);
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.textContent = line;
+            tr.appendChild(td);
+            fragment.appendChild(tr);
         });
         activeList.appendChild(fragment);
     };
