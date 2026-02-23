@@ -5,6 +5,23 @@ const PERKEZ_HOST = "www.perkez.be";
 const JINA_PROXY_PREFIX = "https://r.jina.ai/http://";
 const FETCH_TIMEOUT_MS = 12000;
 const MAX_SUMMARY_LINES = 8;
+const REEKS2_FALLBACK_PDF_URL = "https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf";
+
+const REEKS_PATTERNS = {
+    reeks1: [
+        /\bettelgem\s*78\b/i,
+        /\bettelgem\s*82\b/i,
+        /\bkvk\s*ettelgem'?78\b/i,
+        /\bkvk\s*ettelgem'?82\b/i,
+        /\bettelgem78\b/i,
+        /\bettelgem82\b/i
+    ],
+    reeks2: [
+        /\bettelgem\s*68\b/i,
+        /\bkvk\s*ettelgem'?68\b/i,
+        /\bettelgem68\b/i
+    ]
+};
 
 function jsonResponse(statusCode, payload) {
     return {
@@ -85,7 +102,7 @@ function filterScoreLine(rawLine) {
     if (!/[A-Za-zÀ-ÿ]/.test(line)) return null;
     if (/^\d{1,2}\s*[-:]\s*\d{1,2}$/.test(line)) return null;
     if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(line)) return null;
-    if (/\b(straat|laan|weg|plein|bus|nr\.?|nummer|koekelare|oudenburg|ettelgem)\b/i.test(line)) return null;
+    if (/\b(straat|laan|weg|plein|bus|nr\.?|nummer|koekelare|oudenburg)\b/i.test(line)) return null;
     if (/\b\d{4}\b/.test(line)) return null;
     if (!/\b(vs|tegen|ettelgem|fc|vk|kvk|united|vrienden|merci|gistel|beerst|bekegem)\b/i.test(line)) return null;
     if (/^(www\.|http|koninklijke|wekelijks|officieel|verbondsorgaan)/i.test(line)) return null;
@@ -127,6 +144,42 @@ function extractResultsSummaryFromPdfText(pdfText) {
     }
 
     return collected;
+}
+
+function buildResultsByReeks(lines) {
+    const grouped = {
+        reeks1: [],
+        reeks2: []
+    };
+
+    if (!Array.isArray(lines) || !lines.length) return grouped;
+
+    const seen = {
+        reeks1: new Set(),
+        reeks2: new Set()
+    };
+
+    lines.forEach((line) => {
+        if (typeof line !== "string") return;
+        const normalized = line.trim();
+        if (!normalized) return;
+
+        if (REEKS_PATTERNS.reeks1.some((pattern) => pattern.test(normalized))) {
+            if (!seen.reeks1.has(normalized)) {
+                seen.reeks1.add(normalized);
+                grouped.reeks1.push(normalized);
+            }
+        }
+
+        if (REEKS_PATTERNS.reeks2.some((pattern) => pattern.test(normalized))) {
+            if (!seen.reeks2.has(normalized)) {
+                seen.reeks2.add(normalized);
+                grouped.reeks2.push(normalized);
+            }
+        }
+    });
+
+    return grouped;
 }
 
 function extractDate(text, num) {
@@ -206,6 +259,7 @@ function parseLatestVerbondsblad(html) {
                 url,
                 postUrl,
                 resultsSummary,
+                resultsByReeks: buildResultsByReeks(resultsSummary),
                 resultsSummaryText: resultsSummary.join(" | ")
             }
         ];
@@ -225,6 +279,7 @@ function parseLatestVerbondsblad(html) {
             url: normalizePdfUrl(best.url),
             postUrl: null,
             resultsSummary: [],
+            resultsByReeks: { reeks1: [], reeks2: [] },
             resultsSummaryText: ""
         }
     ];
@@ -282,6 +337,21 @@ async function enrichLatestItem(item) {
             }
         } catch {
             // Keep empty summary if PDF text extraction fails.
+        }
+    }
+
+    enriched.resultsByReeks = buildResultsByReeks(enriched.resultsSummary);
+
+    if (!enriched.resultsByReeks.reeks2.length) {
+        try {
+            const fallbackPdfText = await extractPdfTextViaJina(REEKS2_FALLBACK_PDF_URL);
+            const fallbackSummary = extractResultsSummaryFromPdfText(fallbackPdfText);
+            const fallbackByReeks = buildResultsByReeks(fallbackSummary);
+            if (fallbackByReeks.reeks2.length) {
+                enriched.resultsByReeks.reeks2 = fallbackByReeks.reeks2;
+            }
+        } catch {
+            // Keep reeks2 empty if fallback PDF cannot be parsed.
         }
     }
 

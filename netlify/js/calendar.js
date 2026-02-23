@@ -104,30 +104,53 @@ function createResultCard(item) {
 
 function renderLatestResultsSummary(items) {
     const wrapper = document.querySelector("#verbondsblad-summary");
-    const list = document.querySelector("#verbondsblad-summary-list");
+    const listReeks1 = document.querySelector("#verbondsblad-summary-list-reeks-1");
+    const listReeks2 = document.querySelector("#verbondsblad-summary-list-reeks-2");
     const emptyText = document.querySelector("#verbondsblad-summary-empty");
-    if (!wrapper || !list || !emptyText) return;
+    if (!wrapper || !listReeks1 || !listReeks2 || !emptyText) return;
 
-    list.innerHTML = "";
+    listReeks1.innerHTML = "";
+    listReeks2.innerHTML = "";
     const firstItem = Array.isArray(items) && items.length ? items[0] : null;
-    const summaryLines = Array.isArray(firstItem?.resultsSummary)
-        ? firstItem.resultsSummary.filter((line) => typeof line === "string" && line.trim() !== "")
+    const byReeks = firstItem?.resultsByReeks && typeof firstItem.resultsByReeks === "object"
+        ? firstItem.resultsByReeks
+        : null;
+
+    const linesReeks1 = Array.isArray(byReeks?.reeks1)
+        ? byReeks.reeks1.filter((line) => typeof line === "string" && line.trim() !== "")
+        : [];
+    const linesReeks2 = Array.isArray(byReeks?.reeks2)
+        ? byReeks.reeks2.filter((line) => typeof line === "string" && line.trim() !== "")
         : [];
 
-    if (!summaryLines.length) {
+    if (!linesReeks1.length && !linesReeks2.length) {
         emptyText.classList.remove("is-hidden");
         wrapper.classList.remove("is-hidden");
         return;
     }
 
     emptyText.classList.add("is-hidden");
-    const fragment = document.createDocumentFragment();
-    summaryLines.forEach((line) => {
-        const li = document.createElement("li");
-        li.textContent = line;
-        fragment.appendChild(li);
-    });
-    list.appendChild(fragment);
+
+    const appendLines = (targetList, lines) => {
+        if (!lines.length) {
+            const li = document.createElement("li");
+            li.className = "summary-empty-line";
+            li.textContent = "Geen nieuwe uitslagen in dit verbondsblad.";
+            targetList.appendChild(li);
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        lines.forEach((line) => {
+            const li = document.createElement("li");
+            li.textContent = line;
+            fragment.appendChild(li);
+        });
+        targetList.appendChild(fragment);
+    };
+
+    appendLines(listReeks1, linesReeks1);
+    appendLines(listReeks2, linesReeks2);
     wrapper.classList.remove("is-hidden");
 }
 

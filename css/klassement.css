@@ -36,6 +36,18 @@
     color: var(--dark);
 }
 
+.verbondsblad-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-medium);
+}
+
+.verbondsblad-summary-col h5 {
+    font-size: 1.4rem;
+    margin: 0 0 0.8rem 0;
+    color: var(--green-dark);
+}
+
 .verbondsblad-summary ul {
     margin: 0;
     padding-left: 2rem;
@@ -51,6 +63,17 @@
     margin: 0;
     font-size: 1.4rem;
     color: var(--text-muted);
+}
+
+.summary-empty-line {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .verbondsblad-summary-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .klassement-tabs {
