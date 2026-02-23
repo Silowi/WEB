@@ -24,7 +24,7 @@ De form moet deze attributen hebben:
   class="contact-form"
   name="contact"
   method="POST"
-  action="/"
+  action="/"Z
   data-netlify="true"
   netlify-honeypot="bot-field"
 >
