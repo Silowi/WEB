@@ -68,7 +68,7 @@ function extractResultsSummary(sectionHtml) {
         const line = stripHtml(match[1]);
         if (!line) continue;
         if (!SCORE_PATTERN.test(line)) continue;
-        if (!/[A-Za-zÃ€-Ã¿]/.test(line)) continue;
+        if (!/[A-Za-z]/.test(line)) continue;
 
         const normalized = line.replace(/\s+/g, " ").trim();
         if (seen.has(normalized)) continue;
@@ -86,12 +86,12 @@ function filterScoreLine(rawLine) {
     if (!line) return null;
     if (line.length < 8 || line.length > 160) return null;
     if (!SCORE_PATTERN.test(line)) return null;
-    if (!/[A-Za-zÃ€-Ã¿]/.test(line)) return null;
+    if (!/[A-Za-z]/.test(line)) return null;
     if (/^\d{1,2}\s*[-:]\s*\d{1,2}$/.test(line)) return null;
     if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(line)) return null;
     if (/\b(straat|laan|weg|plein|bus|nr\.?|nummer|koekelare|oudenburg)\b/i.test(line)) return null;
     if (/\b\d{4}\b/.test(line)) return null;
-    if (!/\b[A-Za-zÀ-ÿ]{2,}\b.*\d{1,2}\s*[-:]\s*\d{1,2}.*\b[A-Za-zÀ-ÿ]{2,}\b/.test(line)) return null;
+    if (!/\b[A-Za-z]{2,}\b.*\d{1,2}\s*[-:]\s*\d{1,2}.*\b[A-Za-z]{2,}\b/.test(line)) return null;
     if (/^(www\.|http|koninklijke|wekelijks|officieel|verbondsorgaan)/i.test(line)) return null;
     return line;
 }
@@ -208,11 +208,11 @@ function extractResultsByReeksFromPdfText(pdfText) {
 }
 
 function extractDate(text, num) {
-    const byNumber = new RegExp(`Verbondsblad\\s*${num}[\\s\\S]{0,220}?(\\d{1,2}\\s+[A-Za-zÃ€-Ã¿]+\\s+\\d{4})`, "i");
+    const byNumber = new RegExp(`Verbondsblad\\s*${num}[\\s\\S]{0,220}?(\\d{1,2}\\s+[A-Za-z]+\\s+\\d{4})`, "i");
     const numberMatch = text.match(byNumber);
     if (numberMatch?.[1]) return numberMatch[1].trim();
 
-    const plainMatch = text.match(/(\d{1,2}\s+[A-Za-zÃ€-Ã¿]+\s+\d{4})/i);
+    const plainMatch = text.match(/(\d{1,2}\s+[A-Za-z]+\s+\d{4})/i);
     if (plainMatch?.[1]) return plainMatch[1].trim();
 
     const slashMatch = text.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
@@ -420,6 +420,7 @@ exports.handler = async (event) => {
         });
     }
 };
+
 
 
 
