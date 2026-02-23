@@ -85,6 +85,9 @@ function filterScoreLine(rawLine) {
     if (!/[A-Za-zÀ-ÿ]/.test(line)) return null;
     if (/^\d{1,2}\s*[-:]\s*\d{1,2}$/.test(line)) return null;
     if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(line)) return null;
+    if (/\b(straat|laan|weg|plein|bus|nr\.?|nummer|koekelare|oudenburg|ettelgem)\b/i.test(line)) return null;
+    if (/\b\d{4}\b/.test(line)) return null;
+    if (!/\b(vs|tegen|ettelgem|fc|vk|kvk|united|vrienden|merci|gistel|beerst|bekegem)\b/i.test(line)) return null;
     if (/^(www\.|http|koninklijke|wekelijks|officieel|verbondsorgaan)/i.test(line)) return null;
     return line;
 }
