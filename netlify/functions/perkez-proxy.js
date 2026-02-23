@@ -9,6 +9,19 @@ const REEKS2_FALLBACK_PDF_URL = "https://www.perkez.be/website/wp-content/upload
 
 const REEKS1_MARKERS = [/reeks\s*een/i, /reeks\s*1/i];
 const REEKS2_MARKERS = [/reeks\s*twee/i, /reeks\s*2/i];
+const REEKS1_TEAM_TOKENS = [
+    "kvkettelgem78", "kvkettelgem82", "ettelgem78", "ettelgem82",
+    "devereniging", "gistelunited", "kvmiddelkerke", "vvgistel",
+    "fceernegem", "hangover98", "vcdemerci", "fcedelweiss",
+    "vkbekegem", "fcbeerst", "fcvodevrienden", "houthandeltavernier",
+    "vvterstraeten"
+];
+const REEKS2_TEAM_TOKENS = [
+    "kvkettelgem68", "ettelgem68", "oseernegem", "vkbistrotvliegplein",
+    "vkmarcassou", "vkvoegwkvandaele", "rozeveldvrienden", "fcdeengel",
+    "fcdesamis", "osbeerst", "fcdenoek", "fcvertex", "fchippo12",
+    "vkcentrumvrienden"
+];
 
 function jsonResponse(statusCode, payload) {
     return {
@@ -133,6 +146,25 @@ function extractResultsSummaryFromPdfText(pdfText) {
     return collected;
 }
 
+function normalizeLineForTeamMatch(line) {
+    return line
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]/g, "");
+}
+
+function classifyLineReeks(line) {
+    const normalized = normalizeLineForTeamMatch(line);
+    const hasReeks2 = REEKS2_TEAM_TOKENS.some((token) => normalized.includes(token));
+    if (hasReeks2) return "reeks2";
+
+    const hasReeks1 = REEKS1_TEAM_TOKENS.some((token) => normalized.includes(token));
+    if (hasReeks1) return "reeks1";
+
+    return null;
+}
+
 function buildResultsByReeks(lines) {
     const grouped = { reeks1: [], reeks2: [] };
     if (!Array.isArray(lines)) return grouped;
@@ -144,17 +176,17 @@ function buildResultsByReeks(lines) {
         const normalized = line.trim();
         if (!normalized) return;
 
-        if (/\bettelgem\s*68\b|\bettelgem68\b|\bkvk\s*ettelgem'?68\b/i.test(normalized)) {
+        const reeks = classifyLineReeks(normalized);
+        if (reeks === "reeks2") {
             if (!seen2.has(normalized)) {
                 seen2.add(normalized);
                 grouped.reeks2.push(normalized);
             }
-            return;
-        }
-
-        if (!seen1.has(normalized)) {
-            seen1.add(normalized);
-            grouped.reeks1.push(normalized);
+        } else if (reeks === "reeks1") {
+            if (!seen1.has(normalized)) {
+                seen1.add(normalized);
+                grouped.reeks1.push(normalized);
+            }
         }
     });
 
@@ -191,10 +223,14 @@ function extractResultsByReeksFromPdfText(pdfText) {
         }
 
         const scoreLine = filterScoreLine(rawLine);
-        if (!scoreLine || !activeReeks) continue;
-        if (seen[activeReeks].has(scoreLine)) continue;
-        seen[activeReeks].add(scoreLine);
-        grouped[activeReeks].push(scoreLine);
+        if (!scoreLine) continue;
+
+        const classifiedReeks = classifyLineReeks(scoreLine);
+        const targetReeks = classifiedReeks || activeReeks;
+        if (!targetReeks) continue;
+        if (seen[targetReeks].has(scoreLine)) continue;
+        seen[targetReeks].add(scoreLine);
+        grouped[targetReeks].push(scoreLine);
 
         if (grouped.reeks1.length >= MAX_SUMMARY_LINES && grouped.reeks2.length >= MAX_SUMMARY_LINES) break;
     }
