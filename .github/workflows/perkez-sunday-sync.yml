@@ -1,0 +1,50 @@
+name: Perkez Sunday Sync
+
+on:
+  schedule:
+    # Runs every hour on Sunday (UTC). A timezone gate below limits this to 13:00-18:00 Europe/Brussels.
+    - cron: "5 * * * 0"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Sunday window (Europe/Brussels, 13:00-18:00)
+        id: window
+        shell: bash
+        run: |
+          day="$(TZ=Europe/Brussels date +%u)"
+          hour="$(TZ=Europe/Brussels date +%H)"
+          if [ "$day" = "7" ] && [ "$hour" -ge 13 ] && [ "$hour" -le 18 ]; then
+            echo "in_window=true" >> "$GITHUB_OUTPUT"
+            echo "Within Sunday sync window (Europe/Brussels)."
+          else
+            echo "in_window=false" >> "$GITHUB_OUTPUT"
+            echo "Outside Sunday sync window; skipping."
+          fi
+
+      - name: Validate site URL
+        if: steps.window.outputs.in_window == 'true' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
+        run: |
+          if [ -z "$SITE_BASE_URL" ]; then
+            echo "Repository variable SITE_BASE_URL is not set."
+            echo "Set it to your live URL, e.g. https://your-site.netlify.app"
+            exit 1
+          fi
+
+      - name: Trigger Perkez refresh endpoint
+        if: steps.window.outputs.in_window == 'true' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
+        run: |
+          set -euo pipefail
+          endpoint="${SITE_BASE_URL%/}/.netlify/functions/perkez-proxy"
+          echo "Calling ${endpoint}"
+          curl --fail --silent --show-error "$endpoint" | head -c 500
+          echo ""
+          echo "Refresh call completed."
