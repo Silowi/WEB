@@ -77,4 +77,5 @@ body h3{
     font-family: 'Sora', 'Manrope', sans-serif;
     border: none;
     box-shadow: var(--shadow-cta);
+    cursor: pointer;
 }
