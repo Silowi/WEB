@@ -104,39 +104,45 @@ function createResultCard(item) {
 
 function renderLatestResultsSummary(items) {
     const wrapper = document.querySelector("#verbondsblad-summary");
-    const listReeks1 = document.querySelector("#verbondsblad-summary-list-reeks-1");
-    const listReeks2 = document.querySelector("#verbondsblad-summary-list-reeks-2");
+    const title = document.querySelector("#verbondsblad-summary-title");
+    const activeList = document.querySelector("#verbondsblad-summary-list-active");
     const emptyText = document.querySelector("#verbondsblad-summary-empty");
-    if (!wrapper || !listReeks1 || !listReeks2 || !emptyText) return;
+    if (!wrapper || !title || !activeList || !emptyText) return;
 
-    listReeks1.innerHTML = "";
-    listReeks2.innerHTML = "";
+    activeList.innerHTML = "";
     const firstItem = Array.isArray(items) && items.length ? items[0] : null;
     const byReeks = firstItem?.resultsByReeks && typeof firstItem.resultsByReeks === "object"
         ? firstItem.resultsByReeks
         : null;
 
-    const linesReeks1 = Array.isArray(byReeks?.reeks1)
+    const linesByReeks = {
+        "1": Array.isArray(byReeks?.reeks1)
         ? byReeks.reeks1.filter((line) => typeof line === "string" && line.trim() !== "")
-        : [];
-    const linesReeks2 = Array.isArray(byReeks?.reeks2)
+        : [],
+        "2": Array.isArray(byReeks?.reeks2)
         ? byReeks.reeks2.filter((line) => typeof line === "string" && line.trim() !== "")
-        : [];
+        : []
+    };
 
-    if (!linesReeks1.length && !linesReeks2.length) {
+    if (!linesByReeks["1"].length && !linesByReeks["2"].length) {
         emptyText.classList.remove("is-hidden");
         wrapper.classList.remove("is-hidden");
         return;
     }
 
     emptyText.classList.add("is-hidden");
+    wrapper.classList.remove("is-hidden");
 
-    const appendLines = (targetList, lines) => {
+    const renderForReeks = (reeksId) => {
+        const lines = linesByReeks[reeksId] || [];
+        title.textContent = reeksId === "2" ? "Reeks 2" : "Reeks 1";
+        activeList.innerHTML = "";
+
         if (!lines.length) {
             const li = document.createElement("li");
             li.className = "summary-empty-line";
             li.textContent = "Geen nieuwe uitslagen in dit verbondsblad.";
-            targetList.appendChild(li);
+            activeList.appendChild(li);
             return;
         }
 
@@ -146,12 +152,20 @@ function renderLatestResultsSummary(items) {
             li.textContent = line;
             fragment.appendChild(li);
         });
-        targetList.appendChild(fragment);
+        activeList.appendChild(fragment);
     };
 
-    appendLines(listReeks1, linesReeks1);
-    appendLines(listReeks2, linesReeks2);
-    wrapper.classList.remove("is-hidden");
+    const currentActiveButton = document.querySelector(".klassement-tab-btn.active");
+    const initialReeks = currentActiveButton?.dataset?.reeks === "2" ? "2" : "1";
+    renderForReeks(initialReeks);
+
+    if (wrapper.dataset.reeksListenerBound !== "true") {
+        document.addEventListener("klassement:reekschange", (event) => {
+            const reeksId = event?.detail?.reeksId === "2" ? "2" : "1";
+            renderForReeks(reeksId);
+        });
+        wrapper.dataset.reeksListenerBound = "true";
+    }
 }
 
 function renderResultCards(container, items) {

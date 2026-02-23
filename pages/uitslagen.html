@@ -47,71 +47,67 @@
         <div id="klassement" class="klassement-section">
             <h3>Klassement</h3>
             <p class="klassement-last-updated">Laatst bijgewerkt: --</p>
-            <div id="verbondsblad-summary" class="verbondsblad-summary is-hidden" aria-live="polite">
-                <h4>Meest recente uitslagen uit verbondsblad</h4>
-                <div class="verbondsblad-summary-grid">
-                    <div class="verbondsblad-summary-col">
-                        <h5>Reeks 1 (Ettelgem 78 &amp; 82)</h5>
-                        <ul id="verbondsblad-summary-list-reeks-1"></ul>
+            <div class="klassement-layout">
+                <div class="klassement-main">
+                    <!-- Reeks Tabs -->
+                    <div class="klassement-tabs">
+                        <button class="klassement-tab-btn active" type="button" data-reeks="1">Reeks 1 (Ettelgem 78 & 82)</button>
+                        <button class="klassement-tab-btn" type="button" data-reeks="2">Reeks 2 (Ettelgem 68)</button>
                     </div>
-                    <div class="verbondsblad-summary-col">
-                        <h5>Reeks 2 (Ettelgem 68)</h5>
-                        <ul id="verbondsblad-summary-list-reeks-2"></ul>
+
+                    <!-- Klassement Reeks 1 (78 & 82) -->
+                    <div id="klassement-reeks-1" class="klassement-table-wrapper active">
+                        <table class="klassement-table">
+                            <thead>
+                                <tr>
+                                    <th class="center">#</th>
+                                    <th>Team</th>
+                                    <th class="center">Ges</th>
+                                    <th class="center hide-mobile">W</th>
+                                    <th class="center hide-mobile">G</th>
+                                    <th class="center hide-mobile">V</th>
+                                    <th class="center hide-mobile">DV</th>
+                                    <th class="center hide-mobile">DT</th>
+                                    <th class="center">+/-</th>
+                                    <th class="center">Ptn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamisch ingeladen via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Klassement Reeks 2 (68) -->
+                    <div id="klassement-reeks-2" class="klassement-table-wrapper" hidden>
+                        <table class="klassement-table">
+                            <thead>
+                                <tr>
+                                    <th class="center">#</th>
+                                    <th>Team</th>
+                                    <th class="center">Ges</th>
+                                    <th class="center hide-mobile">W</th>
+                                    <th class="center hide-mobile">G</th>
+                                    <th class="center hide-mobile">V</th>
+                                    <th class="center hide-mobile">DV</th>
+                                    <th class="center hide-mobile">DT</th>
+                                    <th class="center">+/-</th>
+                                    <th class="center">Ptn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamisch ingeladen via JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <p id="verbondsblad-summary-empty" class="verbondsblad-summary-empty is-hidden">Nog geen uitslagen gevonden in het meest recente verbondsblad.</p>
-            </div>
 
-            <!-- Reeks Tabs -->
-            <div class="klassement-tabs">
-                <button class="klassement-tab-btn active" type="button" data-reeks="1">Reeks 1 (Ettelgem 78 & 82)</button>
-                <button class="klassement-tab-btn" type="button" data-reeks="2">Reeks 2 (Ettelgem 68)</button>
-            </div>
-
-            <!-- Klassement Reeks 1 (78 & 82) -->
-            <div id="klassement-reeks-1" class="klassement-table-wrapper active">
-                <table class="klassement-table">
-                    <thead>
-                        <tr>
-                            <th class="center">#</th>
-                            <th>Team</th>
-                            <th class="center">Ges</th>
-                            <th class="center hide-mobile">W</th>
-                            <th class="center hide-mobile">G</th>
-                            <th class="center hide-mobile">V</th>
-                            <th class="center hide-mobile">DV</th>
-                            <th class="center hide-mobile">DT</th>
-                            <th class="center">+/-</th>
-                            <th class="center">Ptn</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dynamisch ingeladen via JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Klassement Reeks 2 (68) -->
-            <div id="klassement-reeks-2" class="klassement-table-wrapper" hidden>
-                <table class="klassement-table">
-                    <thead>
-                        <tr>
-                            <th class="center">#</th>
-                            <th>Team</th>
-                            <th class="center">Ges</th>
-                            <th class="center hide-mobile">W</th>
-                            <th class="center hide-mobile">G</th>
-                            <th class="center hide-mobile">V</th>
-                            <th class="center hide-mobile">DV</th>
-                            <th class="center hide-mobile">DT</th>
-                            <th class="center">+/-</th>
-                            <th class="center">Ptn</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dynamisch ingeladen via JS -->
-                    </tbody>
-                </table>
+                <aside id="verbondsblad-summary" class="verbondsblad-summary is-hidden" aria-live="polite">
+                    <h4>Laatste uitslagen</h4>
+                    <p id="verbondsblad-summary-title" class="verbondsblad-summary-title">Reeks 1</p>
+                    <ul id="verbondsblad-summary-list-active"></ul>
+                    <p id="verbondsblad-summary-empty" class="verbondsblad-summary-empty is-hidden">Nog geen uitslagen gevonden voor deze reeks.</p>
+                </aside>
             </div>
         </div>
 

@@ -79,6 +79,10 @@ function switchKlassementTab(reeksId, tabButtons, tableWrappers) {
         wrapper.classList.toggle("active", isActive);
         wrapper.hidden = !isActive;
     });
+
+    document.dispatchEvent(new CustomEvent("klassement:reekschange", {
+        detail: { reeksId }
+    }));
 }
 
 function mapTeamToReeks(teamId) {

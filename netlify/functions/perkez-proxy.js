@@ -4,24 +4,11 @@ const SCORE_PATTERN = /\b\d{1,2}\s*[-:]\s*\d{1,2}\b/;
 const PERKEZ_HOST = "www.perkez.be";
 const JINA_PROXY_PREFIX = "https://r.jina.ai/http://";
 const FETCH_TIMEOUT_MS = 12000;
-const MAX_SUMMARY_LINES = 8;
+const MAX_SUMMARY_LINES = 12;
 const REEKS2_FALLBACK_PDF_URL = "https://www.perkez.be/website/wp-content/uploads/Nr-1599.pdf";
 
-const REEKS_PATTERNS = {
-    reeks1: [
-        /\bettelgem\s*78\b/i,
-        /\bettelgem\s*82\b/i,
-        /\bkvk\s*ettelgem'?78\b/i,
-        /\bkvk\s*ettelgem'?82\b/i,
-        /\bettelgem78\b/i,
-        /\bettelgem82\b/i
-    ],
-    reeks2: [
-        /\bettelgem\s*68\b/i,
-        /\bkvk\s*ettelgem'?68\b/i,
-        /\bettelgem68\b/i
-    ]
-};
+const REEKS1_MARKERS = [/reeks\s*een/i, /reeks\s*1/i];
+const REEKS2_MARKERS = [/reeks\s*twee/i, /reeks\s*2/i];
 
 function jsonResponse(statusCode, payload) {
     return {
@@ -104,7 +91,7 @@ function filterScoreLine(rawLine) {
     if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(line)) return null;
     if (/\b(straat|laan|weg|plein|bus|nr\.?|nummer|koekelare|oudenburg)\b/i.test(line)) return null;
     if (/\b\d{4}\b/.test(line)) return null;
-    if (!/\b(vs|tegen|ettelgem|fc|vk|kvk|united|vrienden|merci|gistel|beerst|bekegem)\b/i.test(line)) return null;
+    if (!/\b(vs|tegen)\b/i.test(line)) return null;
     if (/^(www\.|http|koninklijke|wekelijks|officieel|verbondsorgaan)/i.test(line)) return null;
     return line;
 }
@@ -147,37 +134,74 @@ function extractResultsSummaryFromPdfText(pdfText) {
 }
 
 function buildResultsByReeks(lines) {
-    const grouped = {
-        reeks1: [],
-        reeks2: []
-    };
-
-    if (!Array.isArray(lines) || !lines.length) return grouped;
-
-    const seen = {
-        reeks1: new Set(),
-        reeks2: new Set()
-    };
+    const grouped = { reeks1: [], reeks2: [] };
+    if (!Array.isArray(lines)) return grouped;
+    const seen1 = new Set();
+    const seen2 = new Set();
 
     lines.forEach((line) => {
         if (typeof line !== "string") return;
         const normalized = line.trim();
         if (!normalized) return;
 
-        if (REEKS_PATTERNS.reeks1.some((pattern) => pattern.test(normalized))) {
-            if (!seen.reeks1.has(normalized)) {
-                seen.reeks1.add(normalized);
-                grouped.reeks1.push(normalized);
-            }
-        }
-
-        if (REEKS_PATTERNS.reeks2.some((pattern) => pattern.test(normalized))) {
-            if (!seen.reeks2.has(normalized)) {
-                seen.reeks2.add(normalized);
+        if (/\bettelgem\s*68\b|\bettelgem68\b|\bkvk\s*ettelgem'?68\b/i.test(normalized)) {
+            if (!seen2.has(normalized)) {
+                seen2.add(normalized);
                 grouped.reeks2.push(normalized);
             }
+            return;
+        }
+
+        if (!seen1.has(normalized)) {
+            seen1.add(normalized);
+            grouped.reeks1.push(normalized);
         }
     });
+
+    return grouped;
+}
+
+function extractResultsByReeksFromPdfText(pdfText) {
+    const grouped = { reeks1: [], reeks2: [] };
+    if (typeof pdfText !== "string" || !pdfText) return grouped;
+
+    const lines = pdfText.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const seen = { reeks1: new Set(), reeks2: new Set() };
+    let inResults = false;
+    let activeReeks = null;
+
+    for (const rawLine of lines) {
+        const normalized = rawLine.toLowerCase();
+
+        if (normalized.includes("uitslagen")) {
+            inResults = true;
+            continue;
+        }
+        if (!inResults) continue;
+        if (normalized.includes("klassement")) break;
+
+        if (REEKS1_MARKERS.some((marker) => marker.test(normalized))) {
+            activeReeks = "reeks1";
+            continue;
+        }
+        if (REEKS2_MARKERS.some((marker) => marker.test(normalized))) {
+            activeReeks = "reeks2";
+            continue;
+        }
+
+        const scoreLine = filterScoreLine(rawLine);
+        if (!scoreLine || !activeReeks) continue;
+        if (seen[activeReeks].has(scoreLine)) continue;
+        seen[activeReeks].add(scoreLine);
+        grouped[activeReeks].push(scoreLine);
+
+        if (grouped.reeks1.length >= MAX_SUMMARY_LINES && grouped.reeks2.length >= MAX_SUMMARY_LINES) break;
+    }
+
+    if (!grouped.reeks1.length && !grouped.reeks2.length) {
+        const fallbackAll = extractResultsSummaryFromPdfText(pdfText);
+        return buildResultsByReeks(fallbackAll);
+    }
 
     return grouped;
 }
@@ -331,9 +355,13 @@ async function enrichLatestItem(item) {
         try {
             const pdfText = await extractPdfTextViaJina(enriched.url);
             const extractedSummary = extractResultsSummaryFromPdfText(pdfText);
+            const extractedByReeks = extractResultsByReeksFromPdfText(pdfText);
             if (extractedSummary.length) {
                 enriched.resultsSummary = extractedSummary;
                 enriched.resultsSummaryText = extractedSummary.join(" | ");
+            }
+            if (extractedByReeks.reeks1.length || extractedByReeks.reeks2.length) {
+                enriched.resultsByReeks = extractedByReeks;
             }
         } catch {
             // Keep empty summary if PDF text extraction fails.
