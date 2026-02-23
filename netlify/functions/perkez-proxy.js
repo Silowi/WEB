@@ -10,17 +10,16 @@ const REEKS2_FALLBACK_PDF_URL = "https://www.perkez.be/website/wp-content/upload
 const REEKS1_MARKERS = [/reeks\s*een/i, /reeks\s*1/i];
 const REEKS2_MARKERS = [/reeks\s*twee/i, /reeks\s*2/i];
 const REEKS1_TEAM_TOKENS = [
-    "kvkettelgem78", "kvkettelgem82", "ettelgem78", "ettelgem82",
-    "devereniging", "gistelunited", "kvmiddelkerke", "vvgistel",
-    "fceernegem", "hangover98", "vcdemerci", "fcedelweiss",
-    "vkbekegem", "fcbeerst", "fcvodevrienden", "houthandeltavernier",
-    "vvterstraeten"
+    "gistelunited", "vcdemerci", "vkbekegem", "devereniging", "fceernegem",
+    "hangover98", "houthandeltavernier", "vvterstraeten", "fcvodevrienden",
+    "kvkettelgem78", "kvkettelgem82", "fcbeerst", "kvmiddelkerke",
+    "fcedelweiss", "vvgistel", "ettelgem78", "ettelgem82"
 ];
 const REEKS2_TEAM_TOKENS = [
-    "kvkettelgem68", "ettelgem68", "oseernegem", "vkbistrotvliegplein",
-    "vkmarcassou", "vkvoegwkvandaele", "rozeveldvrienden", "fcdeengel",
-    "fcdesamis", "osbeerst", "fcdenoek", "fcvertex", "fchippo12",
-    "vkcentrumvrienden"
+    "oseernegem", "kvkettelgem68", "vkbistrotvliegplein", "vkmarcassou",
+    "vkvoegwkvandaele", "rozeveldvrienden", "fcdeengel", "fcdesamis",
+    "osbeerst", "fcdenoek", "fcvertex", "fchippo12", "vkcentrumvrienden",
+    "ettelgem68"
 ];
 
 function jsonResponse(statusCode, payload) {
@@ -388,7 +387,7 @@ async function enrichLatestItem(item) {
         }
     }
 
-    if ((!Array.isArray(enriched.resultsSummary) || !enriched.resultsSummary.length) && isAllowedPerkezUrl(enriched.url)) {
+    if (isAllowedPerkezUrl(enriched.url)) {
         try {
             const pdfText = await extractPdfTextViaJina(enriched.url);
             const extractedSummary = extractResultsSummaryFromPdfText(pdfText);
@@ -405,13 +404,21 @@ async function enrichLatestItem(item) {
         }
     }
 
-    enriched.resultsByReeks = buildResultsByReeks(enriched.resultsSummary);
+    if (
+        !enriched.resultsByReeks
+        || (
+            !Array.isArray(enriched.resultsByReeks.reeks1)
+            || !Array.isArray(enriched.resultsByReeks.reeks2)
+            || (!enriched.resultsByReeks.reeks1.length && !enriched.resultsByReeks.reeks2.length)
+        )
+    ) {
+        enriched.resultsByReeks = buildResultsByReeks(enriched.resultsSummary);
+    }
 
     if (!enriched.resultsByReeks.reeks2.length) {
         try {
             const fallbackPdfText = await extractPdfTextViaJina(REEKS2_FALLBACK_PDF_URL);
-            const fallbackSummary = extractResultsSummaryFromPdfText(fallbackPdfText);
-            const fallbackByReeks = buildResultsByReeks(fallbackSummary);
+            const fallbackByReeks = extractResultsByReeksFromPdfText(fallbackPdfText);
             if (fallbackByReeks.reeks2.length) {
                 enriched.resultsByReeks.reeks2 = fallbackByReeks.reeks2;
             }
